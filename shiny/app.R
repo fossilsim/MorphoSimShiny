@@ -3,10 +3,12 @@ library(shiny)
 library(shinydashboard)
 library(shinydashboardPlus)
 library(dplyr)
+library(devtools)
 library(FossilSim)
 library(phytools)
 library(TreeSim)
-devtool::load_all(C:\Users\timbr\WisMa_FAU\morphosim)
+library(ggplot2)
+devtools::load_all("C:/Users/timbr/WisMa_FAU/morphosim")
 
 # source the backbone functions
 source("content.R")
