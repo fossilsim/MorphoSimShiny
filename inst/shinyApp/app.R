@@ -6,6 +6,7 @@ require(dplyr)
 require(FossilSim)
 require(phytools)
 require(TreeSim)
+require(devtools)
 devtools::install_github("https://github.com/fossilsim/morphosim")
 library(MorphoSim)
 
@@ -224,7 +225,7 @@ server <- function(input, output, session) {
     
     if (!is.null(data)) {
       # Replot the phylogeny
-      plot.morpho(data, data$tree, show.tip.label = F, l = input$s)
+      plot(data, data$tree, show.tip.label = F, l = input$s)
     } else if (input$b < input$d){
       plot(NA, type = "n", xlim = c(0, 5), ylim = c(0, 3), ann = FALSE, bty = "n", xaxt = "n", yaxt = "n")
       text(x = 2.5, y = 1.5, labels = "Choose a speciation rate > extinction rate", cex = 1.5, col = "#800020")
