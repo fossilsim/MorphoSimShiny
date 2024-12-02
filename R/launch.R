@@ -13,7 +13,7 @@
 #' @export
 
 launchMorphoSimShiny <- function(inbrowser = TRUE) {
-  appDir <- system.file("shinyApp", package = "MorphoSimShiny")
+  appDir <- system.file("app.R", package = "MorphoSimShiny")
   if (appDir == "") {
     stop("Could not find shinyApp. Try re-installing `MorphoSimShiny`.", call. = FALSE)
   }
