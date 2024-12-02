@@ -207,7 +207,7 @@ server <- function(input, output, session) {
     }
     
     # Generate data with the tree
-    data <- MorphoSim::sim.morpho.completeprocess(
+    data <- sim.morpho.completeprocess(
       time.tree = tree, 
       br.rates = input$r,
       k = input$k, 
@@ -224,7 +224,7 @@ server <- function(input, output, session) {
     
     if (!is.null(data)) {
       # Replot the phylogeny
-      MorphoSim::plot.morpho(data, data$tree, show.tip.label = F, l = input$s)
+      plot.morpho(data, data$tree, show.tip.label = F, l = input$s)
     } else if (input$b < input$d){
       plot(NA, type = "n", xlim = c(0, 5), ylim = c(0, 3), ann = FALSE, bty = "n", xaxt = "n", yaxt = "n")
       text(x = 2.5, y = 1.5, labels = "Choose a speciation rate > extinction rate", cex = 1.5, col = "#800020")
@@ -239,7 +239,7 @@ server <- function(input, output, session) {
   output$plot2 <- renderPlot({
     data <- savedData()
     if (!is.null(data)) {
-      MorphoSim::plot.morpho.grid(data)
+      plot.morpho.grid(data)
     } else {
       plot(NA, type = "n", xlim = c(0, 5), ylim = c(0, 3), ann = FALSE, bty = "n", xaxt = "n", yaxt = "n")
       text(x = 2.5, y = 1.5, labels = "No data to display", cex = 1.5, col = "#800020")
