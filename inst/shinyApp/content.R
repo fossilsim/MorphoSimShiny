@@ -11,6 +11,6 @@ return(data)
 }
 
 shiny.grid <- function(data){
-
+library(MorphoSim)
 plot.morpho.grid(data)
 }
