@@ -23,48 +23,39 @@ ui <- shinydashboard::dashboardPage(
       # Controls for # of species
       dropdownBlock(
         id = "controls_species",
-        title = "Species",
+        title = "Tree Parameters",
         icon = icon("hippo"),
         badgeStatus = NULL,
         
-        sliderInput(
+        numericInput(
           inputId = "n",
           label = "Number of species",
           value = 10,
           min = 2,
           max = 20,
-          step = 1
+          step = 1,
         ),
-        helpText("The number of species to reach at which the simulation is stopped")
+        helpText("The number of species to reach at which the simulation is stopped"),
+        
+      sliderInput(
+        inputId = "b",
+        label = "Speciation rate",
+        value = 1,
+        min = 0.1,
+        max = 5
       ),
+      helpText("Rate at which species are diverging"),
       
-      # origination/extion dropdown
-      dropdownBlock(
-        id = "controls_bir_death",
-        title = "Birth/Death Rates",
-        icon = icon("cake-candles"),
-        badgeStatus = NULL,
-        
-        sliderInput(
-          inputId = "b",
-          label = "Speciation rate",
-          value = 1,
-          min = 0.1,
-          max = 5,
-          step = 0.1
-        ),
-        helpText("Rate at which species are diverging"),
-        
-        sliderInput(
-          inputId = "d",
-          label = "Extinction rate",
-          value = 0.5,
-          min = 0,
-          max = 5,
-          step = 0.1
-        ),
-        helpText("Rate at which species are going extinct")
+      sliderInput(
+        inputId = "d",
+        label = "Extinction rate",
+        value = 0.5,
+        min = 0,
+        max = 5,
+        step = 0.1
       ),
+      helpText("Rate at which species are going extinct")
+    ),
       
       # dropdown for trait parameters
       dropdownBlock(
@@ -73,22 +64,20 @@ ui <- shinydashboard::dashboardPage(
         icon = icon("hashtag"),
         badgeStatus = NULL,
         
-        sliderInput(
+        numericInput(
           inputId = "l",
           label = "Number of traits",
           value = 5,
           min = 1,
-          max = 20,
-          step = 1
+          max = 20
         ),
         
-        sliderInput(
+        numericInput(
           inputId = "k",
           label = "Character states",
           value = 2,
           min = 2,
-          max = 8,
-          step = 1
+          max = 8
         ),
         helpText("The number of different character states for traits")
       ),
@@ -121,13 +110,12 @@ ui <- shinydashboard::dashboardPage(
         icon = icon("sliders-h"),
         badgeStatus = NULL,
         
-      sliderInput(
+      numericInput(
         inputId = "s",
         label = "Shown Character",
         value = 1,
         min = 1,
-        max = 20,
-        step = 1
+        max = 20
       )
     ),
 
@@ -166,6 +154,15 @@ ui <- shinydashboard::dashboardPage(
         solidHeader = TRUE,
         width = 4,
         plotOutput(outputId = "plot2")
+      ),
+      fluidRow(
+        box(
+          title = "Simulation Details",
+          status = "primary",
+          solidHeader = TRUE,
+          width = 12,
+          uiOutput("simulationInfo")
+        )
       )
     )
   )
@@ -184,6 +181,7 @@ server <- function(input, output, session) {
     if (newickString != "") {
       tryCatch({
         tree <- ape::read.tree(text = newickString)
+        #input$n <- length(tree$tip.label)
         return(tree)
       }, error = function(e) {
         showModal(modalDialog(
@@ -205,7 +203,7 @@ server <- function(input, output, session) {
     if (is.null(tree)) {
       # If no valid Newick string, generate random tree using sim.bd.taxa
       tree <- TreeSim::sim.bd.taxa(n = input$n, numbsim = 1, lambda = input$b, mu = input$d, frac = 1)[[1]]
-    }
+       }
     
     # Generate data with the tree
     data <- sim.morpho.completeprocess(
@@ -247,7 +245,34 @@ server <- function(input, output, session) {
     }
   })
   observeEvent(input$l, {
-    updateSliderInput(session, "s", max = input$l)
+    updateNumericInput(session, "s", max = input$l)
+  })
+  
+  output$simulationInfo <- renderUI({
+    data <- savedData()
+    if (!is.null(data)) {
+      tagList(
+        h4("Simulation Results"),
+        textOutput("simDetails"),
+        textAreaInput(
+          inputId = "resultText",
+          label = "Simulation Summary",
+          value = paste("Tree:", write.tree(tree), "\n",
+                        "Number of species:", input$n, "\n",
+                        "Speciation rate:", input$b, "\n",
+                        "Extinction rate:", input$d, "\n",
+                        "Number of traits:", input$l, "\n",
+                        "Clock rate:", input$r, "\n",
+                        sep = ""),
+          rows = 6
+        )
+      )
+    } else {
+      tagList(
+        h4("No Simulation Run Yet"),
+        p("Run the simulation to see results.")
+      )
+    }
   })
 }
 
