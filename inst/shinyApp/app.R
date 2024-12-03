@@ -257,7 +257,7 @@ server <- function(input, output, session) {
         textAreaInput(
           inputId = "resultText",
           label = "Simulation Summary",
-          value = paste("Tree:", write.tree(tree), "\n",
+          value = paste("Tree:", write.tree(data$tree), "\n",
                         "Number of species:", input$n, "\n",
                         "Speciation rate:", input$b, "\n",
                         "Extinction rate:", input$d, "\n",
