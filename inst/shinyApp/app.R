@@ -238,7 +238,7 @@ server <- function(input, output, session) {
   output$plot2 <- renderPlot({
     data <- savedData()
     if (!is.null(data)) {
-      shiny.grid(data, l = input$l)
+      shiny.grid(data, l = s)
     } else {
       plot(NA, type = "n", xlim = c(0, 5), ylim = c(0, 3), ann = FALSE, bty = "n", xaxt = "n", yaxt = "n")
       text(x = 2.5, y = 1.5, labels = "No data to display", cex = 1.5, col = "#800020")
