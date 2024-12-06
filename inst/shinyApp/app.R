@@ -248,7 +248,7 @@ server <- function(input, output, session) {
     updateNumericInput(session, "s", max = input$l)
   })
   
-  output$simulationInfo <- renderUI(status = "primary",{
+  output$simulationInfo <- renderUI({
     data <- savedData()
     if (!is.null(data)) {
       tagList(
