@@ -223,7 +223,7 @@ server <- function(input, output, session) {
     
     if (!is.null(data)) {
       # Replot the phylogeny
-      plot(data, data$tree, trait = input$s)
+      plot(data, timetree = T, trait = input$s, br.rates = input$r)
     } else if (input$b < input$d){
       plot(NA, type = "n", xlim = c(0, 5), ylim = c(0, 3), ann = FALSE, bty = "n", xaxt = "n", yaxt = "n")
       text(x = 2.5, y = 1.5, labels = "Choose a speciation rate > extinction rate", cex = 1.5, col = "#800020")
