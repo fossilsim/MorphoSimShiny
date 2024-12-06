@@ -1,3 +1,4 @@
+
 shiny.morpho <- function(n , b , d , l , k, r) {
   tree <-TreeSim::sim.bd.taxa(n, numbsim = 1, lambda = b, mu = d, frac = 1)[[1]]
   data <- sim.morpho.completeprocess(
@@ -10,7 +11,7 @@ shiny.morpho <- function(n , b , d , l , k, r) {
 return(data)
 }
 
-shiny.grid <- function(data){
+shiny.grid <- function(data, l ){
 library(MorphoSim)
-plotMorphoGrid(data)
+plotMorphoGrid(data, num.trait = l )
 }
