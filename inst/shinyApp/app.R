@@ -252,14 +252,14 @@ server <- function(input, output, session) {
     data <- savedData()
     if (!is.null(data)) {
       tagList(
-        h4("Simulation Results"),
+        h4("Simulation Tree"),
         textOutput("simDetails"),
         textAreaInput(
           inputId = "resultText",
-          label = "Simulation Summary",
-          value = paste("Tree:", write.tree(data$tree),
+          label = "Newick String",
+          value = paste(write.tree(data$tree),
                         sep = ""),
-          rows = 1
+          rows = 5
         )
       )
     } else {
