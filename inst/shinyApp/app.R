@@ -248,14 +248,13 @@ server <- function(input, output, session) {
     updateNumericInput(session, "s", max = input$l)
   })
   
-  output$simulationInfo <- renderUI({
+  output$simulationInfo <- renderUI(status = "primary",{
     data <- savedData()
     if (!is.null(data)) {
       tagList(
         h4("Simulation Tree"),
         textOutput("simDetails"),
         textAreaInput(
-          status = "primary",
           inputId = "resultText",
           label = "Newick String",
           value = paste(write.tree(data$tree),
