@@ -255,6 +255,7 @@ server <- function(input, output, session) {
         h4("Simulation Tree"),
         textOutput("simDetails"),
         textAreaInput(
+          status = "primary",
           inputId = "resultText",
           label = "Newick String",
           value = paste(write.tree(data$tree),
