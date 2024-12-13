@@ -1,15 +1,3 @@
-# Load necessary packages
-require(shiny)
-require(shinydashboard)
-require(shinydashboardPlus)
-require(dplyr)
-require(FossilSim)
-require(phytools)
-require(TreeSim)
-require(devtools)
-devtools::install_github("https://github.com/fossilsim/morphosim")
-library(MorphoSim)
-
 # source the backbone functions
 source("content.R")
 

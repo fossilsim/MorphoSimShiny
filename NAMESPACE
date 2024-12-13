@@ -3,4 +3,7 @@
 export(launchMorphoSimShiny)
 import(FossilSim)
 import(MorphoSim)
+import(ape)
 import(shiny)
+import(shinydashboard)
+import(shinydashboardPlus)
