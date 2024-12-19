@@ -13,3 +13,21 @@ return(data)
 shiny.grid <- function(data, l ){
 plotMorphoGrid(data, num.trait = l )
 }
+
+# User specific tree stuff
+parseNewickTree <- function(newickString) {
+  if (newickString != "") {
+    tryCatch({
+      tree <- ape::read.tree(text = newickString)
+      #input$n <- length(tree$tip.label)
+      return(tree)
+    }, error = function(e) {
+      shiny::showModal(modalDialog(
+        title = "Error",
+        paste("Invalid Newick string. Please check the format.")
+      ))
+      return(NULL)
+    })
+  }
+  return(NULL)
+}
