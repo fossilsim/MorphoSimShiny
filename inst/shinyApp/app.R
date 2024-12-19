@@ -130,7 +130,7 @@ ui <- shinydashboard::dashboardPage(
   shinydashboard::dashboardBody(
     shiny::fluidRow(
       shiny::uiOutput("paramWarning"),
-      shinydashboardPLus::box(
+      shinydashboardPlus::box(
         title = "Simulated Phylogeny",
         status = NULL,
         solidHeader = TRUE,
