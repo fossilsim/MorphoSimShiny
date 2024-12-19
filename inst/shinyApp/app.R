@@ -21,7 +21,7 @@ ui <- shinydashboard::dashboardPage(
           value = 10,
           min = 2,
           max = 20,
-          step = 1,
+          step = 1
         ),
         helpText("The number of extant tips to reach at which the simulation is stopped"),
         
@@ -228,8 +228,7 @@ server <- function(input, output, session) {
         shiny::textAreaInput(
           inputId = "resultText",
           label = "Newick String",
-          value = paste(write.tree(data$tree), \n,
-                       input$n ,
+          value = paste(write.tree(data$tree),
                         sep = ""),
           rows = 5
         )
