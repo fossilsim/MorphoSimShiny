@@ -8,6 +8,9 @@
 #' 
 #' 
 #' @import shiny
+#' @import shinydashboard
+#' @import shinydashboardPlus
+#' @import ape
 #' @import MorphoSim
 #' @import FossilSim
 #' @export

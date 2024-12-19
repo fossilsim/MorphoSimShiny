@@ -23,7 +23,7 @@ ui <- shinydashboard::dashboardPage(
           max = 20,
           step = 1,
         ),
-        helpText("The number of species to reach at which the simulation is stopped"),
+        helpText("The number of extant tips to reach at which the simulation is stopped"),
         
       sliderInput(
         inputId = "b",
@@ -32,7 +32,7 @@ ui <- shinydashboard::dashboardPage(
         min = 0.1,
         max = 5
       ),
-      helpText("Rate at which species are diverging"),
+      helpText("Rate at which lineages are diverging"),
       
       sliderInput(
         inputId = "d",
@@ -42,7 +42,7 @@ ui <- shinydashboard::dashboardPage(
         max = 5,
         step = 0.1
       ),
-      helpText("Rate at which species are going extinct")
+      helpText("Rate at which lineages are going extinct")
     ),
       
       # dropdown for trait parameters
@@ -129,6 +129,7 @@ ui <- shinydashboard::dashboardPage(
     # for the main plots tree first matrix second
   dashboardBody(
     fluidRow(
+      uiOutput("paramWarning"),
       box(
         title = "Simulated Phylogeny",
         status = NULL,
@@ -152,7 +153,7 @@ ui <- shinydashboard::dashboardPage(
           uiOutput("simulationInfo")
         )
       )
-    )
+    ) 
   )
 )
 
@@ -254,6 +255,34 @@ server <- function(input, output, session) {
       tagList(
         h4("No Simulation Run Yet"),
         p("Run the simulation to see results.")
+      )
+    }
+  })
+  # Reactive value to track parameter changes
+  paramsChanged <- reactiveVal(FALSE)
+  
+  # Observe changes in parameters
+  observe({
+    # List of input parameters to track
+    paramInputs <- list(input$n, input$b, input$d, input$l, input$k, input$r, input$newickTree)
+    
+    # If any parameter changes, set the flag to TRUE
+    paramsChanged(TRUE)
+  })
+  
+  # Reset the flag when the simulation button is clicked
+  observeEvent(input$goButton, {
+    paramsChanged(FALSE) # Parameters are now up-to-date
+  })
+  
+  # Display a notification if parameters are changed but the simulation is not yet re-run
+  output$paramWarning <- renderUI({
+    if (paramsChanged()) {
+      div(
+        class = "alert alert-warning",
+        role = "alert",
+        strong("Notice: "),
+        "You have changed parameters but have not run a new simulation yet."
       )
     }
   })
