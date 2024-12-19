@@ -46,7 +46,7 @@ ui <- shinydashboard::dashboardPage(
     ),
       
       # dropdown for trait parameters
-      shinydashboaardPlus::dropdownBlock(
+      shinydashboardPlus::dropdownBlock(
         id = "controls_trait_params",
         title = "Trait Parameters",
         icon = icon("hashtag"),
