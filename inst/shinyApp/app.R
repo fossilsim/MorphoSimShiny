@@ -177,7 +177,7 @@ server <- function(input, output, session) {
        }
     
     # Generate data with the tree
-    data <- sim.morpho.completeprocess(
+    data <- MorphoSim::sim.morpho.completeprocess(
       time.tree = tree, 
       br.rates = input$r,
       k = input$k, 
@@ -249,17 +249,17 @@ server <- function(input, output, session) {
     paramInputs <- list(input$n, input$b, input$d, input$l, input$k, input$r, input$newickTree)
     
     # If any parameter changes, set the flag to TRUE
-    shiny::paramsChanged(TRUE)
+    paramsChanged(TRUE)
   })
   
   # Reset the flag when the simulation button is clicked
   shiny::observeEvent(input$goButton, {
-    shiny::paramsChanged(FALSE) # Parameters are now up-to-date
+    paramsChanged(FALSE) # Parameters are now up-to-date
   })
   
   # Display a notification if parameters are changed but the simulation is not yet re-run
   output$paramWarning <- shiny::renderUI({
-    if (shiny::paramsChanged()) {
+    if (paramsChanged()) {
       shiny::div(
         class = "alert alert-warning",
         role = "alert",

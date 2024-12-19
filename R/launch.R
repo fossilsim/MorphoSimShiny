@@ -8,8 +8,12 @@
 #' 
 #' 
 #' @import shiny
-#' @import shinydashboard
-#' @import shinydashboardPlus
+#' @importFrom shinydashboard dashboardPage
+#' @importFrom shinydashboard dashboardSidebar
+#' @importFrom shinydashboard dashboardBody
+#' @importFrom shinydashboardPlus box
+#' @importFrom shinydashboardPlus dashboardHeader
+#' @importFrom shinydashboardPlus dropdownBlock
 #' @import ape
 #' @import MorphoSim
 #' @import FossilSim
