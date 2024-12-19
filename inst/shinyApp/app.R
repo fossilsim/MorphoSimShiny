@@ -7,15 +7,15 @@ ui <- shinydashboard::dashboardPage(
   header = shinydashboardPlus::dashboardHeader(
     title = "MorphoSim Shiny",
     # this is for the Ui display
-    leftUi = tagList(
+    leftUi = shiny::tagList(
       # Controls for # of species
-      dropdownBlock(
+      shinydashboardPlus::dropdownBlock(
         id = "controls_species",
         title = "Tree Parameters",
         icon = icon("hippo"),
         badgeStatus = NULL,
         
-        numericInput(
+        shiny::numericInput(
           inputId = "n",
           label = "Number of species",
           value = 10,
@@ -25,7 +25,7 @@ ui <- shinydashboard::dashboardPage(
         ),
         helpText("The number of extant tips to reach at which the simulation is stopped"),
         
-      sliderInput(
+      shiny::sliderInput(
         inputId = "b",
         label = "Speciation rate",
         value = 1,
@@ -34,7 +34,7 @@ ui <- shinydashboard::dashboardPage(
       ),
       helpText("Rate at which lineages are diverging"),
       
-      sliderInput(
+      shiny::sliderInput(
         inputId = "d",
         label = "Extinction rate",
         value = 0.5,
@@ -46,13 +46,13 @@ ui <- shinydashboard::dashboardPage(
     ),
       
       # dropdown for trait parameters
-      dropdownBlock(
+      shinydashboaardPlus::dropdownBlock(
         id = "controls_trait_params",
         title = "Trait Parameters",
         icon = icon("hashtag"),
         badgeStatus = NULL,
         
-        numericInput(
+        shiny::numericInput(
           inputId = "l",
           label = "Number of traits",
           value = 5,
@@ -60,7 +60,7 @@ ui <- shinydashboard::dashboardPage(
           max = 20
         ),
         
-        numericInput(
+        shiny::numericInput(
           inputId = "k",
           label = "Character states",
           value = 2,
@@ -71,13 +71,13 @@ ui <- shinydashboard::dashboardPage(
       ),
       
       # Clock Rate dropdown
-      dropdownBlock(
+      shinydashboardPlus::dropdownBlock(
         id = "controls_clock_rate",
         title = "Clock Rate",
         icon = icon("clock"),
         badgeStatus = NULL,
         
-        sliderInput(
+        shiny::sliderInput(
           inputId = "r",
           label = "Clock rate",
           value = 0.2,
@@ -89,16 +89,16 @@ ui <- shinydashboard::dashboardPage(
       ),
       
       #  Simulation button
-      actionButton("goButton", "Start Simulation"),
+      shiny::actionButton("goButton", "Start Simulation"),
       
       # Post plotting Character slider
-      dropdownBlock(
+      shinydashboardPlus::dropdownBlock(
         id = "Plotted Characters",
         title = "Plotted Characters",
         icon = icon("sliders-h"),
         badgeStatus = NULL,
         
-      numericInput(
+      shiny::numericInput(
         inputId = "s",
         label = "Shown Character",
         value = 1,
@@ -108,13 +108,13 @@ ui <- shinydashboard::dashboardPage(
     ),
 
     # for a user specific tree this breaks currently
-    dropdownBlock(
+    shinydashboardPlus::dropdownBlock(
       id = "controls_newick_tree",
       title = "User specific Tree",
       icon = icon("tree"),
       badgeStatus = NULL,
       
-      textAreaInput(
+      shiny::textAreaInput(
         inputId = "newickTree",
         label = "Enter Newick String for Tree",
         value = "",
@@ -125,11 +125,11 @@ ui <- shinydashboard::dashboardPage(
     ))
   ),
   
-  dashboardSidebar(disable = TRUE),
+  shinydashboard::dashboardSidebar(disable = TRUE),
     # for the main plots tree first matrix second
-  dashboardBody(
-    fluidRow(
-      uiOutput("paramWarning"),
+  shinydashboard::dashboardBody(
+    shiny::fluidRow(
+      shiny::uiOutput("paramWarning"),
       box(
         title = "Simulated Phylogeny",
         status = NULL,
@@ -137,15 +137,15 @@ ui <- shinydashboard::dashboardPage(
         width = 8,
         plotOutput(outputId = "plot1")
       ),
-      box(
+      shinydashboardPlus::box(
         title = "Character Matrix",
         status = NULL,
         solidHeader = TRUE,
         width = 4,
         plotOutput(outputId = "plot2")
       ),
-      fluidRow(
-        box(
+      shiny::fluidRow(
+        shinydashboardPlus::box(
           title = "Simulation Details",
           status = "primary",
           solidHeader = TRUE,
@@ -162,29 +162,11 @@ ui <- shinydashboard::dashboardPage(
 server <- function(input, output, session) {
   
   # reactiveVal to store the data
-  savedData <- reactiveVal(NULL)
+  savedData <- shiny::reactiveVal(NULL)
   
-
-  # User specific tree stuff
-  parseNewickTree <- function(newickString) {
-    if (newickString != "") {
-      tryCatch({
-        tree <- ape::read.tree(text = newickString)
-        #input$n <- length(tree$tip.label)
-        return(tree)
-      }, error = function(e) {
-        showModal(modalDialog(
-          title = "Error",
-          paste("Invalid Newick string. Please check the format.")
-        ))
-        return(NULL)
-      })
-    }
-    return(NULL)
-  }
   
   # Run the simulation and save data upon click of the button to rule them all
-  observeEvent(input$goButton, {
+  shiny::observeEvent(input$goButton, {
     req(input$b > input$d)  # Ensure speciation rate is greater than extinction rate
     
     # Check if Newick string is provided, if not generate tree
@@ -224,7 +206,7 @@ server <- function(input, output, session) {
   })
   
   # Render Character Matrix 
-  output$plot2 <- renderPlot({
+  output$plot2 <- shiny::renderPlot({
     data <- savedData()
     if (!is.null(data)) {
       shiny.grid(data, l = input$s)
@@ -233,52 +215,53 @@ server <- function(input, output, session) {
       text(x = 2.5, y = 1.5, labels = "No data to display", cex = 1.5, col = "#800020")
     }
   })
-  observeEvent(input$l, {
-    updateNumericInput(session, "s", max = input$l)
+  shiny::observeEvent(input$l, {
+    shiny::updateNumericInput(session, "s", max = input$l)
   })
   
-  output$simulationInfo <- renderUI({
+  output$simulationInfo <- shiny::renderUI({
     data <- savedData()
     if (!is.null(data)) {
-      tagList(
-        h4("Simulation Tree"),
-        textOutput("simDetails"),
-        textAreaInput(
+      shiny::tagList(
+        shiny::h4("Simulation Tree"),
+        shiny::textOutput("simDetails"),
+        shiny::textAreaInput(
           inputId = "resultText",
           label = "Newick String",
-          value = paste(write.tree(data$tree),
+          value = paste(write.tree(data$tree), \n,
+                       input$n ,
                         sep = ""),
           rows = 5
         )
       )
     } else {
-      tagList(
-        h4("No Simulation Run Yet"),
-        p("Run the simulation to see results.")
+      shiny::tagList(
+        shiny::h4("No Simulation Run Yet"),
+        shiny::p("Run the simulation to see results.")
       )
     }
   })
   # Reactive value to track parameter changes
-  paramsChanged <- reactiveVal(FALSE)
+  paramsChanged <- shiny::reactiveVal(FALSE)
   
   # Observe changes in parameters
-  observe({
+  shiny::observe({
     # List of input parameters to track
     paramInputs <- list(input$n, input$b, input$d, input$l, input$k, input$r, input$newickTree)
     
     # If any parameter changes, set the flag to TRUE
-    paramsChanged(TRUE)
+    shiny::paramsChanged(TRUE)
   })
   
   # Reset the flag when the simulation button is clicked
-  observeEvent(input$goButton, {
-    paramsChanged(FALSE) # Parameters are now up-to-date
+  shiny::observeEvent(input$goButton, {
+    shiny::paramsChanged(FALSE) # Parameters are now up-to-date
   })
   
   # Display a notification if parameters are changed but the simulation is not yet re-run
-  output$paramWarning <- renderUI({
-    if (paramsChanged()) {
-      div(
+  output$paramWarning <- shiny::renderUI({
+    if (shiny::paramsChanged()) {
+      shiny::div(
         class = "alert alert-warning",
         role = "alert",
         strong("Notice: "),
