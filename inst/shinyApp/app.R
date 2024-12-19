@@ -228,7 +228,7 @@ server <- function(input, output, session) {
         shiny::textAreaInput(
           inputId = "resultText",
           label = "Newick String",
-          value = paste(write.tree(data$tree),
+          value = paste(ape::write.tree(data$tree),
                         sep = ""),
           rows = 5
         )

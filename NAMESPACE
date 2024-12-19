@@ -3,6 +3,7 @@
 export(launchMorphoSimShiny)
 import(FossilSim)
 import(MorphoSim)
+import(TreeSim)
 import(ape)
 import(shiny)
 importFrom(shinydashboard,dashboardBody)

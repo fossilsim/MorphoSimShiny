@@ -15,6 +15,7 @@
 #' @importFrom shinydashboardPlus dashboardHeader
 #' @importFrom shinydashboardPlus dropdownBlock
 #' @import ape
+#' @import TreeSim
 #' @import MorphoSim
 #' @import FossilSim
 #' @export
