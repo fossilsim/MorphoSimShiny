@@ -1,2 +1,4 @@
-^MorphoSimShiny\.Rproj$
+^.*\.Rproj$
 ^\.Rproj\.user$
+^\\.git$
+^\\.gitignore$

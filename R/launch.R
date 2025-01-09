@@ -18,6 +18,7 @@
 #' @import TreeSim
 #' @import MorphoSim
 #' @import FossilSim
+
 #' @export
 
 launchMorphoSimShiny <- function(inbrowser = TRUE) {
