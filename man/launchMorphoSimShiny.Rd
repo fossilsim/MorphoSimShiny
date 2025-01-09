@@ -15,3 +15,7 @@ No return value, called for side effects.
 \description{
 This the function used to launch the shiny app.
 }
+\examples{
+launchMorphoSimShiny()
+
+}
