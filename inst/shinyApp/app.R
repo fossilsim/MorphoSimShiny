@@ -3,7 +3,7 @@ source("content.R")
 
 # Define UI
 ui <- shinydashboard::dashboardPage(
-  skin = "black",
+ skin = "black",
   header = shinydashboardPlus::dashboardHeader(
     title = "MorphoSim Shiny",
     # this is for the Ui display
@@ -11,7 +11,7 @@ ui <- shinydashboard::dashboardPage(
       # Controls for # of species
       shinydashboardPlus::dropdownBlock(
         id = "controls_species",
-        title = "Tree Parameters",
+        title = "Tree",
         icon = icon("hippo"),
         badgeStatus = NULL,
 
@@ -45,48 +45,79 @@ ui <- shinydashboard::dashboardPage(
       helpText("Rate at which lineages are going extinct")
     ),
 
+
+    # Clock Rate dropdown
+    shinydashboardPlus::dropdownBlock(
+      id = "controls_clock_rate",
+      title = "Clock Rate",
+      icon = icon("clock"),
+      badgeStatus = NULL,
+
+      shiny::sliderInput(
+        inputId = "r",
+        label = "Clock rate",
+        value = 0.2,
+        min = 0.1,
+        max = 1,
+        step = 0.1
+      ),
+      helpText("Clock rate for trait evolution")
+    ),
+
+
+
       # dropdown for trait parameters
-      shinydashboardPlus::dropdownBlock(
-        id = "controls_trait_params",
-        title = "Trait Parameters",
-        icon = icon("hashtag"),
-        badgeStatus = NULL,
+    shinydashboardPlus::dropdownBlock(
+      id = "controls_trait_partitions",
+      title = "Partitions",
+      icon = icon("hashtag"),
+      badgeStatus = NULL,
 
-        shiny::numericInput(
-          inputId = "l",
-          label = "Number of traits",
-          value = 5,
-          min = 1,
-          max = 20
-        ),
-
-        shiny::numericInput(
-          inputId = "k",
-          label = "Character states",
-          value = 2,
-          min = 2,
-          max = 8
-        ),
-        helpText("The number of different character states for traits")
+      shiny::numericInput(
+        inputId = "l",
+        label = "Number of Partitions",
+        value = 1,
+        min = 1,
+        max = 20
       ),
+      helpText("The number of partitions for the trait evolution")
+    ),
 
-      # Clock Rate dropdown
-      shinydashboardPlus::dropdownBlock(
-        id = "controls_clock_rate",
-        title = "Clock Rate",
-        icon = icon("clock"),
-        badgeStatus = NULL,
+    # dropdown for dynamic trait inputs based on number of partitions
+    shinydashboardPlus::dropdownBlock(
+      id = "controls_trait_params",
+      title = "Traits",
+      icon = icon("hashtag"),
+      badgeStatus = NULL,
 
-        shiny::sliderInput(
-          inputId = "r",
-          label = "Clock rate",
-          value = 0.2,
-          min = 0.1,
-          max = 1,
-          step = 0.1
-        ),
-        helpText("Clock rate for trait evolution")
-      ),
+      uiOutput("group_inputs")  # Render the dynamic trait inputs here
+    ),
+
+
+    shinydashboardPlus::dropdownBlock(
+      id = "controls_trait_states",
+      title = "States",
+      icon = icon("hashtag"),
+      badgeStatus = NULL,
+
+      uiOutput("state_inputs")  # Render the dynamic state inputs here
+    ),
+
+
+    # Variable Coding - Yes/No checkbox
+    shinydashboardPlus::dropdownBlock(
+      id = "controls_variable_coding",
+      title = "Variable Coding",
+      icon = icon("cogs"),
+      badgeStatus = NULL,
+
+      shiny::checkboxInput(
+        inputId = "variableCoding",
+        label = "Simulate varying characters only",
+        value = FALSE
+      )
+    ),
+
 
       #  Simulation button
       shiny::actionButton("goButton", "Start Simulation"),
@@ -100,7 +131,7 @@ ui <- shinydashboard::dashboardPage(
 
       shiny::numericInput(
         inputId = "s",
-        label = "Shown Character",
+        label = "Show Trait",
         value = 1,
         min = 1,
         max = 20
@@ -160,6 +191,41 @@ ui <- shinydashboard::dashboardPage(
 
 # Server Logic
 server <- function(input, output, session) {
+# Dynamically generate dropdowns for the number of people per group
+  output$group_inputs <- renderUI({
+    req(input$l) # Ensure num_groups is available
+    num_groups <- as.numeric(input$l)
+
+    # Generate dropdowns for each group
+    lapply(1:num_groups, function(i) {
+      selectInput(
+        inputId = paste0("group_", i),
+        label = paste("Number of traits in partition", i),
+        choices = 1:100,
+        selected = 1
+      )
+
+    })
+  })
+
+  output$state_inputs <- renderUI({
+    req(input$l)  # Ensure number of partitions is available
+    num_partitions <- as.numeric(input$l)
+
+    # Generate dropdowns for the number of states per partition
+    lapply(1:num_partitions, function(i) {
+      selectInput(
+        inputId = paste0("state_", i),
+        label = paste("Number of States in Partition", i),
+        choices = 2:10,  # Assuming the states range from 1 to 10
+        selected = 1
+      )
+    })
+  })
+
+
+
+
 
   # reactiveVal to store the data
   savedData <- shiny::reactiveVal(NULL)
@@ -176,12 +242,30 @@ server <- function(input, output, session) {
       tree <- TreeSim::sim.bd.taxa(n = input$n, numbsim = 1, lambda = input$b, mu = input$d, frac = 1)[[1]]
        }
 
+   # get information for partitions
+
+    # Create a vector of number of traits for each partition (from the dynamic inputs)
+    num_traits_vector <- sapply(1:as.numeric(input$l), function(i) {
+      as.numeric(input[[paste0("group_", i)]])  # Access the number of traits for each partition
+    })
+
+    # Create a vector of states for each partition (from the dynamic inputs)
+    num_states_vector <- sapply(1:as.numeric(input$l), function(i) {
+      as.numeric(input[[paste0("state_", i)]])  # Access the number of states for each partition
+    })
+
+
+    # Access the variable coding selection (Yes/No)
+    variable_coding <- input$variableCoding
+
     # Generate data with the tree
     data <- MorphoSim::sim.morpho(
       time.tree = tree,
       br.rates = input$r,
-      k = input$k,
-      trait.num = input$l
+      k = num_states_vector,
+      trait.num = sum(num_traits_vector),
+      partition = num_traits_vector,
+      variable = variable_coding
     )
     # Save the data for later
     savedData(data)

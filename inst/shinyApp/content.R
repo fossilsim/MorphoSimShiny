@@ -1,9 +1,9 @@
 shiny.morpho <- function(n , b , d , l , k, r) {
   tree <-TreeSim::sim.bd.taxa(n, numbsim = 1, lambda = b, mu = d, frac = 1)[[1]]
-  data <- MorphoSim::sim.morpho.completeprocess(
-    time.tree = tree, 
+  data <- MorphoSim::sim.morpho(
+    time.tree = tree,
     br.rates = r,
-    k = k, 
+    k = k,
     trait.num = l,
   )
 
