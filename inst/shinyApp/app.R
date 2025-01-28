@@ -75,7 +75,7 @@ ui <- shinydashboard::dashboardPage(
 
       shiny::numericInput(
         inputId = "l",
-        label = "Number of Partitions",
+        label = "Number of partitions",
         value = 1,
         min = 1,
         max = 20
@@ -113,7 +113,7 @@ ui <- shinydashboard::dashboardPage(
 
       shiny::checkboxInput(
         inputId = "variableCoding",
-        label = "Simulate varying characters only",
+        label = "Simulate varying traits only",
         value = FALSE
       )
     ),
@@ -175,6 +175,13 @@ ui <- shinydashboard::dashboardPage(
         width = 4,
         plotOutput(outputId = "plot2")
       ),
+
+      div(
+        style = "margin-left: 20px;",  # Apply style to the div
+        checkboxInput("keepTreeFixed", "Fix tree", value = FALSE)
+      ),
+
+
       shiny::fluidRow(
         shinydashboardPlus::box(
           title = "Simulation Details",
@@ -216,7 +223,7 @@ server <- function(input, output, session) {
     lapply(1:num_partitions, function(i) {
       selectInput(
         inputId = paste0("state_", i),
-        label = paste("Number of States in Partition", i),
+        label = paste("Number of states in partition", i),
         choices = 2:10,  # Assuming the states range from 1 to 10
         selected = 1
       )
@@ -229,18 +236,27 @@ server <- function(input, output, session) {
 
   # reactiveVal to store the data
   savedData <- shiny::reactiveVal(NULL)
-
+  currentTree <- shiny::reactiveVal(NULL)
 
   # Run the simulation and save data upon click of the button to rule them all
   shiny::observeEvent(input$goButton, {
     req(input$b > input$d)  # Ensure speciation rate is greater than extinction rate
 
-    # Check if Newick string is provided, if not generate tree
-    tree <- parseNewickTree(input$newickTree)
-    if (is.null(tree)) {
-      # If no valid Newick string, generate random tree using sim.bd.taxa
-      tree <- TreeSim::sim.bd.taxa(n = input$n, numbsim = 1, lambda = input$b, mu = input$d, frac = 1)[[1]]
-       }
+    if (is.null(currentTree()) || !input$keepTreeFixed) {
+      tree <- parseNewickTree(input$newickTree)
+      if (is.null(tree)) {
+        tree <- TreeSim::sim.bd.taxa(
+          n = input$n,
+          numbsim = 1,
+          lambda = input$b,
+          mu = input$d,
+          frac = 1
+        )[[1]]
+      }
+      currentTree(tree)  # Update reactive value
+    } else {
+      tree <- currentTree()  # Use existing reactive value
+    }
 
    # get information for partitions
 
