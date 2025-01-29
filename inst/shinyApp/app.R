@@ -11,7 +11,7 @@ ui <- shinydashboard::dashboardPage(
       # Controls for # of species
       shinydashboardPlus::dropdownBlock(
         id = "controls_species",
-        title = "Tree",
+        title = "Tree Model",
         icon = icon("hippo"),
         badgeStatus = NULL,
 
@@ -49,7 +49,7 @@ ui <- shinydashboard::dashboardPage(
     # Clock Rate dropdown
     shinydashboardPlus::dropdownBlock(
       id = "controls_clock_rate",
-      title = "Clock Rate",
+      title = "Clock Model",
       icon = icon("clock"),
       badgeStatus = NULL,
 
@@ -107,15 +107,20 @@ ui <- shinydashboard::dashboardPage(
     # Variable Coding - Yes/No checkbox
     shinydashboardPlus::dropdownBlock(
       id = "controls_variable_coding",
-      title = "Variable Coding",
+      title = "Morphological Model",
       icon = icon("cogs"),
       badgeStatus = NULL,
 
       shiny::checkboxInput(
         inputId = "variableCoding",
-        label = "Simulate varying traits only",
+        label = "Simulate varying traits only (MkV)",
         value = FALSE
-      )
+      ),
+      shiny::checkboxInput(
+        inputId = "useGamma",
+        label ="Simulate rate variation (Gamma)",
+        value = FALSE
+        )
     ),
 
 
@@ -125,7 +130,7 @@ ui <- shinydashboard::dashboardPage(
       # Post plotting Character slider
       shinydashboardPlus::dropdownBlock(
         id = "Plotted Characters",
-        title = "Plotted Characters",
+        title = "Plotting",
         icon = icon("sliders-h"),
         badgeStatus = NULL,
 
@@ -141,7 +146,7 @@ ui <- shinydashboard::dashboardPage(
     # for a user specific tree this breaks currently
     shinydashboardPlus::dropdownBlock(
       id = "controls_newick_tree",
-      title = "User specific Tree",
+      title = "Provide a Tree",
       icon = icon("tree"),
       badgeStatus = NULL,
 
@@ -237,6 +242,7 @@ server <- function(input, output, session) {
   # reactiveVal to store the data
   savedData <- shiny::reactiveVal(NULL)
   currentTree <- shiny::reactiveVal(NULL)
+  totalTraits <- shiny::reactiveVal(NULL)
 
   # Run the simulation and save data upon click of the button to rule them all
   shiny::observeEvent(input$goButton, {
@@ -271,8 +277,11 @@ server <- function(input, output, session) {
     })
 
 
+    totalTraits(sum( num_traits_vector))
     # Access the variable coding selection (Yes/No)
     variable_coding <- input$variableCoding
+
+    acrv_value <- if (input$useGamma) "gamma" else NULL
 
     # Generate data with the tree
     data <- MorphoSim::sim.morpho(
@@ -281,7 +290,8 @@ server <- function(input, output, session) {
       k = num_states_vector,
       trait.num = sum(num_traits_vector),
       partition = num_traits_vector,
-      variable = variable_coding
+      variable = variable_coding,
+      ACRV = acrv_value
     )
     # Save the data for later
     savedData(data)
@@ -316,7 +326,7 @@ server <- function(input, output, session) {
     }
   })
   shiny::observeEvent(input$l, {
-    shiny::updateNumericInput(session, "s", max = input$l)
+    shiny::updateNumericInput(session, "s", max = totalTraits())
   })
 
   output$simulationInfo <- shiny::renderUI({
