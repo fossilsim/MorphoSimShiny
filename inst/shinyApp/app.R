@@ -261,9 +261,9 @@ server <- function(input, output, session) {
    # get information for partitions
 
     # Create a vector of number of traits for each partition (from the dynamic inputs)
-    num_traits_vector <- sapply(1:as.numeric(input$l), function(i) {
-      as.numeric(input[[paste0("group_", i)]])  # Access the number of traits for each partition
-    })
+    num_traits_vector <- as.numeric(unlist(sapply(1:as.numeric(input$l), function(i) {
+    input[[paste0("group_", i)]]
+    })))
 
     # Create a vector of states for each partition (from the dynamic inputs)
     num_states_vector <- sapply(1:as.numeric(input$l), function(i) {
