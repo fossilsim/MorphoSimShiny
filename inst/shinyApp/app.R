@@ -338,7 +338,7 @@ server <- function(input, output, session) {
 
     if (!is.null(data)) {
       # Replot the phylogeny
-      plot(data, timetree = T, trait = input$s, br.rates = input$r )
+      shinyplot(data, timetree = T, trait = input$s, br.rates = input$r, cbType = input$cbType )
     } else if (input$b < input$d){
       plot(NA, type = "n", xlim = c(0, 5), ylim = c(0, 3), ann = FALSE, bty = "n", xaxt = "n", yaxt = "n")
       text(x = 2.5, y = 1.5, labels = "Choose a speciation rate > extinction rate", cex = 1.5, col = "#800020")
@@ -374,8 +374,7 @@ server <- function(input, output, session) {
           label = "Newick String",
           value = paste(ape::write.tree(data$tree),
                         sep = ""),
-          rows = 5,
-          width = "70%"
+          rows = 5
         ),   
         shiny::actionButton(
           inputId = "copyButton",
