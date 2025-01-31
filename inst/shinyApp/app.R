@@ -158,6 +158,26 @@ ui <- shinydashboard::dashboardPage(
         placeholder = "Enter Newick string here"
       ),
       helpText("If empty, a random tree will be generated.")
+    ),
+    shinydashboardPlus::dropdownBlock(
+      id = "Colorblind",
+      title = "Colorblindness",
+      icon = icon("glasses"),
+      badgeStatus = NULL,
+      
+      shiny::selectInput(
+        inputId = "cbType",
+        label = "Select your condition:",
+        choices = list(
+          "None" = "none",
+          "Protanopia (Red-Blind)" = "protanopia",
+          "Deuteranopia (Green-Blind)" = "deuteranopia",
+          "Tritanopia (Blue-Blind)" = "tritanopia"
+        ),
+        selected = "none"
+      ),
+      
+      helpText("If you have a visual condition, selecting your condition might help with visibility")
     ))
   ),
 
@@ -318,7 +338,7 @@ server <- function(input, output, session) {
 
     if (!is.null(data)) {
       # Replot the phylogeny
-      plot(data, timetree = T, trait = input$s, br.rates = input$r)
+      plot(data, timetree = T, trait = input$s, br.rates = input$r )
     } else if (input$b < input$d){
       plot(NA, type = "n", xlim = c(0, 5), ylim = c(0, 3), ann = FALSE, bty = "n", xaxt = "n", yaxt = "n")
       text(x = 2.5, y = 1.5, labels = "Choose a speciation rate > extinction rate", cex = 1.5, col = "#800020")
@@ -333,7 +353,7 @@ server <- function(input, output, session) {
   output$plot2 <- shiny::renderPlot({
     data <- savedData()
     if (!is.null(data)) {
-      shiny.grid(data, l = input$s)
+      shiny.grid(data, l = input$s, cbType = input$cbType)
     } else {
       plot(NA, type = "n", xlim = c(0, 5), ylim = c(0, 3), ann = FALSE, bty = "n", xaxt = "n", yaxt = "n")
       text(x = 2.5, y = 1.5, labels = "No data to display", cex = 1.5, col = "#800020")
@@ -355,7 +375,7 @@ server <- function(input, output, session) {
           value = paste(ape::write.tree(data$tree),
                         sep = ""),
           rows = 5,
-          width = "80%"
+          width = "70%"
         ),   
         shiny::actionButton(
           inputId = "copyButton",
@@ -377,7 +397,7 @@ server <- function(input, output, session) {
   # Observe changes in parameters
   shiny::observe({
     # List of input parameters to track
-    paramInputs <- list(input$n, input$b, input$d, input$l, input$k, input$r, input$newickTree)
+    paramInputs <- list(input$n, input$b, input$d, input$l, input$k, input$r, input$newickTree, input$cbType)
 
     # If any parameter changes, set the flag to TRUE
     paramsChanged(TRUE)

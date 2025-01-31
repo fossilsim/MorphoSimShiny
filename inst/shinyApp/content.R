@@ -10,8 +10,19 @@ shiny.morpho <- function(n , b , d , l , k, r) {
 return(data)
 }
 
-shiny.grid <- function(data, l ){
-MorphoSim::plotMorphoGrid(data, num.trait = l )
+
+
+shiny.grid <- function(data, l, cbType = "none" ){
+  if (cbType == "none"){
+    cb = c("#d3d3d3", "#add8e6", "#ffc0cb", "#ffff64", "#008000", "#ffa500", "#e6e6fa", "#ff7f50") # standard
+  } else if (cbType == "protanopia"){
+    cb = c("#d6d0d1", "#cecee0", "#d2cdd2", "#fff7df", "#7c6d00", "#d0b711", "#e5e5fa", "#b3a25c") # Protanopia
+  } else if (cbType == "deuteranopia"){
+    cb = c("#e6cbd4", "#d8caea", "#e7c8c7", "#fff6ed", "#8a671d", "#eaad00", "#f4e0fb", "#cb9a49") # Deuteranopia
+  } else if (cbType == "tritanopia"){
+    cb = c("#d4cfe0", "#acd6e8", "#ffbecd", "#fff5fa", "#3a757f", "#ff9ba5", "#e5e5f8", "#ff7982") # Tritanopia
+  } else{print("there was an error with the color scheme")}
+MorphoSim::plotMorphoGrid(data, num.trait = l, col = cb)
 }
 
 # User specific tree stuff
