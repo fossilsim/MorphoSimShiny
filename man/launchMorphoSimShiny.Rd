@@ -16,6 +16,8 @@ No return value, called for side effects.
 This the function used to launch the shiny app.
 }
 \examples{
-launchMorphoSimShiny()
+if (interactive()) {
+  launchMorphoSimShiny()
+}
 
 }

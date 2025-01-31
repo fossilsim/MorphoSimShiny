@@ -20,7 +20,9 @@
 #' @import FossilSim
 #' 
 #' @examples 
-#' launchMorphoSimShiny()
+#' if (interactive()) {
+#'   launchMorphoSimShiny()
+#' }
 #'
 #' @export
 

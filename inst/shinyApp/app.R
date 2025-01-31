@@ -195,7 +195,17 @@ ui <- shinydashboard::dashboardPage(
           width = 12,
           uiOutput("simulationInfo")
         )
-      )
+      ), 
+      shiny::tags$script(HTML("
+  Shiny.addCustomMessageHandler('copyToClipboard', function(message) {
+    var textarea = document.getElementById('resultText');
+    if (textarea) {
+      textarea.select();
+      document.execCommand('copy');
+      alert('Newick string copied to clipboard!');
+    }
+  });
+"))
     )
   )
 )
@@ -272,10 +282,14 @@ server <- function(input, output, session) {
     })))
 
     # Create a vector of states for each partition (from the dynamic inputs)
-    num_states_vector <- sapply(1:as.numeric(input$l), function(i) {
-      as.numeric(input[[paste0("state_", i)]])  # Access the number of states for each partition
-    })
+    num_states_vector <- as.numeric(unlist(sapply(1:as.numeric(input$l), function(i) {
+      input[[paste0("state_", i)]]
+    })))
 
+    if (any(is.na(num_states_vector)) || any(is.na(num_traits_vector))) {
+      stop("Error: There are NA in the states or partitions (non-symmetric matrix).")
+    }
+    
 
     totalTraits(sum( num_traits_vector))
     # Access the variable coding selection (Yes/No)
@@ -340,7 +354,14 @@ server <- function(input, output, session) {
           label = "Newick String",
           value = paste(ape::write.tree(data$tree),
                         sep = ""),
-          rows = 5
+          rows = 5,
+          width = "80%"
+        ),   
+        shiny::actionButton(
+          inputId = "copyButton",
+          label = "Copy",
+          icon = icon("copy"),
+          style = "margin-left: 10px;"
         )
       )
     } else {
@@ -377,6 +398,9 @@ server <- function(input, output, session) {
         "You have changed parameters but have not run a new simulation yet."
       )
     }
+  })
+  shiny::observeEvent(input$copyButton, {
+    session$sendCustomMessage("copyToClipboard", NULL)
   })
 }
 
