@@ -11,13 +11,13 @@ return(data)
 }
 shinyplot <- function(data, timetree = T, trait,br.rates, cbType = "none"){
   if (cbType == "none"){
-    cb = c("#d3d3d3", "#add8e6", "#ffc0cb", "#ffff64", "#008000", "#ffa500", "#e6e6fa", "#ff7f50") # standard
+    cb = c("#d3d3d3", "#add8e6", "#ffc0cb", "#ffff64", "#90ee90", "#ffa500", "#e6e6fa", "#ff7f50", "#f5de63", "#ffdeb9", "#60e0e6", "#e0ffff") # standard
   } else if (cbType == "protanopia"){
-    cb = c("#d6d0d1", "#cecee0", "#d2cdd2", "#fff7df", "#7c6d00", "#d0b711", "#e5e5fa", "#b3a25c") # Protanopia
+    cb = c("#e6e6fa", "#b0e0e6", "#f5deb3","#40d0d0","#fafad2", "#98fb98", "#d8bfd8", "#468264", "#87ceeb", "#ffe4b5", "#add8e6", "#ffdead") # Protanopia
   } else if (cbType == "deuteranopia"){
-    cb = c("#e6cbd4", "#d8caea", "#e7c8c7", "#fff6ed", "#8a671d", "#eaad00", "#f4e0fb", "#cb9a49") # Deuteranopia
+    cb = c("#d8bfd8", "#b0c4de", "#eedd82", "#ffdead", "#87ceeb", "#dda0dd", "#faf0e6","#cd853f", "#f5de63", "#bc8f8f", "#ffe4b5", "#ffebcd") # Deuteranopia
   } else if (cbType == "tritanopia"){
-    cb = c("#d4cfe0", "#acd6e8", "#ffbecd", "#fff5fa", "#3a757f", "#ff9ba5", "#e5e5f8", "#ff7982") # Tritanopia
+    cb = c("#f4a460", "#ffb6c1", "#faebd7", "#ffcc9a", "#f5de63", "#d8bfd8", "#ffe4b5","#deb887", "#ffdead", "#e6e6fa", "#ffc0cb", "#ffdab9") # Tritanopia
   } else{print("there was an error with the color scheme")}
   plot(data, timetree = T, trait = trait, br.rates = br.rates, col = cb)
   
@@ -26,13 +26,13 @@ shinyplot <- function(data, timetree = T, trait,br.rates, cbType = "none"){
 
 shiny.grid <- function(data, l, cbType = "none" ){
   if (cbType == "none"){
-    cb = c("#d3d3d3", "#add8e6", "#ffc0cb", "#ffff64", "#008000", "#ffa500", "#e6e6fa", "#ff7f50") # standard
+    cb = c("#d3d3d3", "#add8e6", "#ffc0cb", "#ffff64", "#90ee90", "#ffa500", "#e6e6fa", "#ff7f50", "#f5de63", "#ffdeb9", "#60e0e6", "#e0ffff") # standard
   } else if (cbType == "protanopia"){
-    cb = c("#d6d0d1", "#cecee0", "#d2cdd2", "#fff7df", "#7c6d00", "#d0b711", "#e5e5fa", "#b3a25c") # Protanopia
+    cb = c("#e6e6fa", "#b0e0e6", "#f5deb3","#40d0d0","#fafad2", "#98fb98", "#d8bfd8", "#468264", "#87ceeb", "#ffe4b5", "#add8e6", "#ffdead") # Protanopia
   } else if (cbType == "deuteranopia"){
-    cb = c("#e6cbd4", "#d8caea", "#e7c8c7", "#fff6ed", "#8a671d", "#eaad00", "#f4e0fb", "#cb9a49") # Deuteranopia
+    cb = c("#d8bfd8", "#b0c4de", "#eedd82", "#ffdead", "#87ceeb", "#dda0dd", "#faf0e6","#cd853f", "#f5de63", "#bc8f8f", "#ffe4b5", "#ffebcd") # Deuteranopia
   } else if (cbType == "tritanopia"){
-    cb = c("#d4cfe0", "#acd6e8", "#ffbecd", "#fff5fa", "#3a757f", "#ff9ba5", "#e5e5f8", "#ff7982") # Tritanopia
+    cb = c("#f4a460", "#ffb6c1", "#faebd7", "#ffcc9a", "#f5de63", "#d8bfd8", "#ffe4b5","#deb887", "#ffdead", "#e6e6fa", "#ffc0cb", "#ffdab9") # Tritanopia
   } else{print("there was an error with the color scheme")}
 MorphoSim::plotMorphoGrid(data, num.trait = l, col = cb)
 }

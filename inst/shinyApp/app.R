@@ -181,7 +181,7 @@ ui <- shinydashboard::dashboardPage(
     ))
   ),
 
-  shinydashboard::dashboardSidebar(disable = TRUE),
+  shinydashboard::dashboardSidebar(disable = TRUE, collapsed = T),
     # for the main plots tree first matrix second
   shinydashboard::dashboardBody(
     shiny::fluidRow(
@@ -243,8 +243,8 @@ server <- function(input, output, session) {
       selectInput(
         inputId = paste0("group_", i),
         label = paste("Number of traits in partition", i),
-        choices = 1:100,
-        selected = 1
+        choices = 2:100,
+        selected = 2
       )
 
     })
@@ -259,7 +259,7 @@ server <- function(input, output, session) {
       selectInput(
         inputId = paste0("state_", i),
         label = paste("Number of states in partition", i),
-        choices = 2:10,  # Assuming the states range from 1 to 10
+        choices = 1:10,  # Assuming the states range from 1 to 10 
         selected = 1
       )
     })
@@ -396,7 +396,7 @@ server <- function(input, output, session) {
   # Observe changes in parameters
   shiny::observe({
     # List of input parameters to track
-    paramInputs <- list(input$n, input$b, input$d, input$l, input$k, input$r, input$newickTree, input$cbType)
+    paramInputs <- list(input$n, input$b, input$d, input$l, input$k, input$r, input$newickTree)
 
     # If any parameter changes, set the flag to TRUE
     paramsChanged(TRUE)
