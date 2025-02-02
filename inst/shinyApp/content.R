@@ -7,14 +7,18 @@ shiny.morpho <- function(n , b , d , l , k, r) {
     trait.num = l,
   )
 
-shiny.missing <- function(data, missing){
-  MorphoSim::sim.missing.data(data = data,
-                   method = "random",
-                   probability = missing)
+  return(data)
 }
 
-return(data)
+shiny.missing <- function(data, missing){
+ missing.data <- MorphoSim::sim.missing.data(data = data,
+                   method = "random",
+                   probability = missing)
+
+  return(missing.data)
 }
+
+
 shinyplot <- function(data, timetree = T, trait,br.rates, cbType = "none"){
   if (cbType == "none"){
     cb = c("#d3d3d3", "#add8e6", "#ffc0cb", "#ffff64", "#90ee90", "#ffa500", "#e6e6fa", "#ff7f50", "#f5de63", "#ffdeb9", "#60e0e6", "#e0ffff") # standard
