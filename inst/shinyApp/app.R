@@ -61,7 +61,7 @@ ui <- shinydashboard::dashboardPage(
         max = 1,
         step = 0.1
       ),
-      helpText("Clock rate for trait evolution")
+      helpText("Clock rate for trait evolution using a strict clock model")
     ),
 
 
@@ -120,7 +120,8 @@ ui <- shinydashboard::dashboardPage(
         inputId = "useGamma",
         label ="Simulate rate variation (Gamma)",
         value = FALSE
-        )
+        ),
+      helpText("By default use the Mk model")
     ),
 
 
@@ -273,6 +274,7 @@ server <- function(input, output, session) {
   savedData <- shiny::reactiveVal(NULL)
   currentTree <- shiny::reactiveVal(NULL)
   totalTraits <- shiny::reactiveVal(NULL)
+  simulation_started <- reactiveVal(FALSE)
 
   # Run the simulation and save data upon click of the button to rule them all
   shiny::observeEvent(input$goButton, {
@@ -294,8 +296,9 @@ server <- function(input, output, session) {
       tree <- currentTree()  # Use existing reactive value
     }
 
-   # get information for partitions
 
+
+    # get information for partitions
     # Create a vector of number of traits for each partition (from the dynamic inputs)
     num_traits_vector <- as.numeric(unlist(sapply(1:as.numeric(input$l), function(i) {
       ifelse(is.null(input[[paste0("group_", i)]]), 2, input[[paste0("group_", i)]])
@@ -310,7 +313,7 @@ server <- function(input, output, session) {
     }
 
 
-    totalTraits(sum( num_traits_vector))
+    totalTraits(sum(num_traits_vector))
     # Access the variable coding selection (Yes/No)
     variable_coding <- input$variableCoding
 
@@ -358,7 +361,7 @@ server <- function(input, output, session) {
       text(x = 2.5, y = 1.5, labels = "No data to display", cex = 1.5, col = "#800020")
     }
   })
-  shiny::observeEvent(input$l, {
+  shiny::observeEvent(totalTraits(), {
     shiny::updateNumericInput(session, "s", max = totalTraits())
   })
 
