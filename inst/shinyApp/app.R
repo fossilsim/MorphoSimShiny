@@ -158,26 +158,6 @@ ui <- shinydashboard::dashboardPage(
         placeholder = "Enter Newick string here"
       ),
       helpText("If empty, a random tree will be generated.")
-    ),
-    shinydashboardPlus::dropdownBlock(
-      id = "Colorblind",
-      title = "Colorblindness",
-      icon = icon("glasses"),
-      badgeStatus = NULL,
-      
-      shiny::selectInput(
-        inputId = "cbType",
-        label = "Select your condition:",
-        choices = list(
-          "None" = "none",
-          "Protanopia (Red-Blind)" = "protanopia",
-          "Deuteranopia (Green-Blind)" = "deuteranopia",
-          "Tritanopia (Blue-Blind)" = "tritanopia"
-        ),
-        selected = "none"
-      ),
-      
-      helpText("If you have a visual condition, selecting your condition might help with visibility")
     ))
   ),
 
@@ -206,6 +186,26 @@ ui <- shinydashboard::dashboardPage(
         checkboxInput("keepTreeFixed", "Fix tree", value = FALSE)
       ),
 
+      shinydashboardPlus::dropdownBlock(
+        id = "Colorblind",
+        title = "Colorblindness",
+        icon = icon("glasses"),
+        badgeStatus = NULL,
+
+        shiny::selectInput(
+          inputId = "cbType",
+          label = "Select your condition:",
+          choices = list(
+            "None" = "none",
+            "Protanopia (Red-Blind)" = "protanopia",
+            "Deuteranopia (Green-Blind)" = "deuteranopia",
+            "Tritanopia (Blue-Blind)" = "tritanopia"
+          ),
+          selected = "none"
+        ),
+
+        helpText("If you have a visual condition, selecting your condition might help with visibility")
+      ),
 
       shiny::fluidRow(
         shinydashboardPlus::box(
@@ -215,7 +215,7 @@ ui <- shinydashboard::dashboardPage(
           width = 12,
           uiOutput("simulationInfo")
         )
-      ), 
+      ),
       shiny::tags$script(HTML("
   Shiny.addCustomMessageHandler('copyToClipboard', function(message) {
     var textarea = document.getElementById('resultText');
@@ -243,7 +243,7 @@ server <- function(input, output, session) {
       selectInput(
         inputId = paste0("group_", i),
         label = paste("Number of traits in partition", i),
-        choices = 2:100,
+        choices = 1:100,
         selected = 2
       )
 
@@ -259,8 +259,8 @@ server <- function(input, output, session) {
       selectInput(
         inputId = paste0("state_", i),
         label = paste("Number of states in partition", i),
-        choices = 1:10,  # Assuming the states range from 1 to 10 
-        selected = 1
+        choices = 2:10,
+        selected = 2
       )
     })
   })
@@ -298,18 +298,17 @@ server <- function(input, output, session) {
 
     # Create a vector of number of traits for each partition (from the dynamic inputs)
     num_traits_vector <- as.numeric(unlist(sapply(1:as.numeric(input$l), function(i) {
-    input[[paste0("group_", i)]]
+      ifelse(is.null(input[[paste0("group_", i)]]), 2, input[[paste0("group_", i)]])
     })))
 
-    # Create a vector of states for each partition (from the dynamic inputs)
     num_states_vector <- as.numeric(unlist(sapply(1:as.numeric(input$l), function(i) {
-      input[[paste0("state_", i)]]
+      ifelse(is.null(input[[paste0("state_", i)]]), 2, input[[paste0("state_", i)]])
     })))
 
     if (any(is.na(num_states_vector)) || any(is.na(num_traits_vector))) {
       stop("Error: There are NA in the states or partitions (non-symmetric matrix).")
     }
-    
+
 
     totalTraits(sum( num_traits_vector))
     # Access the variable coding selection (Yes/No)
@@ -375,7 +374,7 @@ server <- function(input, output, session) {
           value = paste(ape::write.tree(data$tree),
                         sep = ""),
           rows = 5
-        ),   
+        ),
         shiny::actionButton(
           inputId = "copyButton",
           label = "Copy",
