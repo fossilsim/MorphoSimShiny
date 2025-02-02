@@ -1,7 +1,7 @@
 # source the backbone functions
 source("content.R")
 
-# Define UI
+#### UI #####
 ui <- shinydashboard::dashboardPage(
  skin = "black",
   header = shinydashboardPlus::dashboardHeader(
@@ -124,7 +124,6 @@ ui <- shinydashboard::dashboardPage(
       helpText("By default use the Mk model")
     ),
 
-
       #  Simulation button
       shiny::actionButton("goButton", "Start Simulation"),
 
@@ -182,10 +181,24 @@ ui <- shinydashboard::dashboardPage(
         plotOutput(outputId = "plot2")
       ),
 
-      div(
-        style = "margin-left: 20px;",  # Apply style to the div
-        checkboxInput("keepTreeFixed", "Fix tree", value = FALSE)
+
+      fluidRow(
+        column(6, offset = 0,
+         checkboxInput("keepTreeFixed", "Fix tree", value = FALSE)
+        ),
+        column(5, offset = 1,
+         uiOutput("explanation_text")
+        )
       ),
+
+
+    fluidRow(
+      column(5, offset = 7,
+    uiOutput("dropdown_ui"),
+    uiOutput("goButton2_ui"))),
+
+
+
 
       shinydashboardPlus::dropdownBlock(
         id = "Colorblind",
@@ -232,7 +245,7 @@ ui <- shinydashboard::dashboardPage(
 )
 
 
-# Server Logic
+##### Server ####
 server <- function(input, output, session) {
 # Dynamically generate dropdowns for the number of people per group
   output$group_inputs <- renderUI({
@@ -276,8 +289,12 @@ server <- function(input, output, session) {
   totalTraits <- shiny::reactiveVal(NULL)
   simulation_started <- reactiveVal(FALSE)
 
+
   # Run the simulation and save data upon click of the button to rule them all
   shiny::observeEvent(input$goButton, {
+
+    buttonClicked <- reactiveVal(FALSE)
+
     req(input$b > input$d)  # Ensure speciation rate is greater than extinction rate
 
     if (is.null(currentTree()) || !input$keepTreeFixed) {
@@ -308,9 +325,6 @@ server <- function(input, output, session) {
       ifelse(is.null(input[[paste0("state_", i)]]), 2, input[[paste0("state_", i)]])
     })))
 
-    if (any(is.na(num_states_vector)) || any(is.na(num_traits_vector))) {
-      stop("Error: There are NA in the states or partitions (non-symmetric matrix).")
-    }
 
 
     totalTraits(sum(num_traits_vector))
@@ -331,6 +345,35 @@ server <- function(input, output, session) {
     )
     # Save the data for later
     savedData(data)
+
+    ## Create button for simulate missing data
+    output$goButton2_ui <- renderUI({
+      actionButton("goButton2", "Simulate Missing data")
+  })
+
+    output$explanation_text <- renderUI({
+      tagList(
+        span("The above simulation generated a complete matrix (i.e, there are no missing character traits).
+              When gathering data from the fossil record however, we will often have a number of missing traits
+             for different taxa. Here you can simulate missing data for you matrix according to a given probability",
+             style = "font-size: 14px; color: gray;")
+  )
+    })
+
+    ## options for missing data
+
+    output$dropdown_ui <- renderUI({
+      shiny::sliderInput(
+        inputId = "missing",
+        label = "Probability of missing data",
+        value = 0.2,
+        min = 0.0,
+        max = 1,
+        step = 0.01
+
+      )
+    })
+
   })
 
   # Render Phylo
@@ -392,6 +435,37 @@ server <- function(input, output, session) {
       )
     }
   })
+
+
+   ## code for sim.missing.data
+
+  observeEvent(input$goButton2,{
+   req(input$missing)
+    # Only run the simulation if the button has been clicked
+    data <- savedData()
+    missing.data <- shiny.missing(data = data, missing = input$missing)
+     output$plot2 <- renderPlot({
+      shiny.grid(missing.data, l = input$s, cbType = input$cbType)
+
+    })
+    }
+  )
+
+  shiny::observeEvent(input$goButton, {  # Render Character Matrix
+    output$plot2 <- shiny::renderPlot({
+      data <- savedData()
+      if (!is.null(data)) {
+        shiny.grid(data, l = input$s, cbType = input$cbType)
+      } else {
+        plot(NA, type = "n", xlim = c(0, 5), ylim = c(0, 3), ann = FALSE, bty = "n", xaxt = "n", yaxt = "n")
+        text(x = 2.5, y = 1.5, labels = "No data to display", cex = 1.5, col = "#800020")
+      }
+    })
+  })
+
+
+
+
   # Reactive value to track parameter changes
   paramsChanged <- shiny::reactiveVal(FALSE)
 
@@ -423,6 +497,7 @@ server <- function(input, output, session) {
   shiny::observeEvent(input$copyButton, {
     session$sendCustomMessage("copyToClipboard", NULL)
   })
+
 }
 
 

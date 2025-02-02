@@ -7,6 +7,12 @@ shiny.morpho <- function(n , b , d , l , k, r) {
     trait.num = l,
   )
 
+shiny.missing <- function(data, missing){
+  MorphoSim::sim.missing.data(data = data,
+                   method = "random",
+                   probability = missing)
+}
+
 return(data)
 }
 shinyplot <- function(data, timetree = T, trait,br.rates, cbType = "none"){
@@ -20,7 +26,7 @@ shinyplot <- function(data, timetree = T, trait,br.rates, cbType = "none"){
     cb = c("#f4a460", "#ffb6c1", "#faebd7", "#ffcc9a", "#f5de63", "#d8bfd8", "#ffe4b5","#deb887", "#ffdead", "#e6e6fa", "#ffc0cb", "#ffdab9") # Tritanopia
   } else{print("there was an error with the color scheme")}
   plot(data, timetree = T, trait = trait, br.rates = br.rates, col = cb)
-  
+
 }
 
 
