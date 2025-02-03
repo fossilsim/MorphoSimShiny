@@ -29,5 +29,5 @@ Use the "PLOTTING" panel to visualize different traits along the tree. You can u
 
 #### Step 5
 Once you have simulated morphological data you can remove some of the information to better match what is commonly available from fossil data.
-Data is removed from the matrix according to a givn probability. 
+Data is removed from the matrix according to a given probability. 
 
