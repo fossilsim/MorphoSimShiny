@@ -11,8 +11,8 @@ ui <- shinydashboard::dashboardPage(
       # Controls for # of species
       shinydashboardPlus::dropdownBlock(
         id = "controls_species",
-        title = "Tree Model",
-        icon = icon("hippo"),
+        title = "Tree",
+        icon = icon("diagram-project"),
         badgeStatus = NULL,
 
         shiny::numericInput(
@@ -46,10 +46,38 @@ ui <- shinydashboard::dashboardPage(
     ),
 
 
+    ## sampling
+    shinydashboardPlus::dropdownBlock(
+      id = "controls_sampling",
+      title = "Sampling",
+      icon = icon("hippo"),
+      badgeStatus = NULL,
+
+      shiny::sliderInput(
+        inputId = "psi",
+        label = "Fossil Sampling",
+        value = 0.5,
+        min = 0,
+        max = 1,
+        step = 0.1
+      ),
+      helpText("Extinct species sampling rate"),
+
+      shiny::sliderInput(
+        inputId = "rho",
+        label = "Extant Sampling",
+        value = 1,
+        min = 0,
+        max = 1,
+        step = 0.1
+      ),
+      helpText("Extant species sampling rate")
+    ),
+
     # Clock Rate dropdown
     shinydashboardPlus::dropdownBlock(
       id = "controls_clock_rate",
-      title = "Clock Model",
+      title = "Clock",
       icon = icon("clock"),
       badgeStatus = NULL,
 
@@ -165,35 +193,32 @@ ui <- shinydashboard::dashboardPage(
     # for the main plots tree first matrix second
   shinydashboard::dashboardBody(
     shiny::fluidRow(
+
+      fluidRow(
+        column(1,checkboxInput("keepTreeFixed", "Fix tree", value = FALSE), style = "padding-right: 5px;"),
+        column(1, checkboxInput("fossils", "Show fossils", value = FALSE))
+      ),
+
+
       shiny::uiOutput("paramWarning"),
       shinydashboardPlus::box(
         title = "Simulated Phylogeny",
         status = NULL,
         solidHeader = TRUE,
-        width = 8,
+        width = 7,
         plotOutput(outputId = "plot1")
       ),
       shinydashboardPlus::box(
         title = "Character Matrix",
         status = NULL,
         solidHeader = TRUE,
-        width = 4,
+        width = 5,
         plotOutput(outputId = "plot2")
       ),
 
-
-      fluidRow(
-        column(6, offset = 0,
-         checkboxInput("keepTreeFixed", "Fix tree", value = FALSE)
-        ),
-        column(5, offset = 1,
-         uiOutput("explanation_text")
-        )
-      ),
-
-
     fluidRow(
       column(5, offset = 7,
+    uiOutput("explanation_text"),
     uiOutput("dropdown_ui"),
     uiOutput("goButton2_ui"))),
 
@@ -279,10 +304,6 @@ server <- function(input, output, session) {
     })
   })
 
-
-
-
-
   # reactiveVal to store the data
   savedData <- shiny::reactiveVal(NULL)
   currentTree <- shiny::reactiveVal(NULL)
@@ -313,7 +334,9 @@ server <- function(input, output, session) {
       tree <- currentTree()  # Use existing reactive value
     }
 
-
+    f = FossilSim::sim.fossils.poisson(rate = input$psi,
+                                       tree = tree,
+                                       root.edge = F)
 
     # get information for partitions
     # Create a vector of number of traits for each partition (from the dynamic inputs)
@@ -333,6 +356,12 @@ server <- function(input, output, session) {
 
     acrv_value <- if (input$useGamma) "gamma" else NULL
 
+    f <- NULL
+    if (!is.null(tree)) {
+      f <- FossilSim::sim.fossils.poisson(rate = input$psi, tree = tree, root.edge = FALSE)
+    }
+    f_vale <- if (isTRUE(input$fossils)) f else NULL
+
     # Generate data with the tree
     data <- MorphoSim::sim.morpho(
       time.tree = tree,
@@ -341,7 +370,8 @@ server <- function(input, output, session) {
       trait.num = sum(num_traits_vector),
       partition = num_traits_vector,
       variable = variable_coding,
-      ACRV = acrv_value
+      ACRV = acrv_value,
+      fossil = f_vale
     )
     # Save the data for later
     savedData(data)
@@ -383,7 +413,7 @@ server <- function(input, output, session) {
 
     if (!is.null(data)) {
       # Replot the phylogeny
-      shinyplot(data, timetree = T, trait = input$s, br.rates = input$r, cbType = input$cbType )
+      shinyplot(data, timetree = T, trait = input$s, br.rates = input$r, cbType = input$cbType, fossil= T )
     } else if (input$b < input$d){
       plot(NA, type = "n", xlim = c(0, 5), ylim = c(0, 3), ann = FALSE, bty = "n", xaxt = "n", yaxt = "n")
       text(x = 2.5, y = 1.5, labels = "Choose a speciation rate > extinction rate", cex = 1.5, col = "#800020")
