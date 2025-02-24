@@ -256,15 +256,14 @@ ui <- shinydashboard::dashboardPage(
         )
       ),
       shiny::tags$script(HTML("
-  Shiny.addCustomMessageHandler('copyToClipboard', function(message) {
-    var textarea = document.getElementById('resultText');
-    if (textarea) {
-      textarea.select();
-      document.execCommand('copy');
-      alert('Newick string copied to clipboard!');
-    }
-  });
-"))
+      Shiny.addCustomMessageHandler('copyToClipboard', function(message) {
+       navigator.clipboard.writeText(message).then(function() {
+        alert('Newick string copied to clipboard!');
+       }).catch(function(err) {
+        console.error('Could not copy text: ', err);
+        });
+        });
+      "))
     )
   )
 )
@@ -524,9 +523,12 @@ server <- function(input, output, session) {
       )
     }
   })
-  shiny::observeEvent(input$copyButton, {
-    session$sendCustomMessage("copyToClipboard", NULL)
-  })
+ shiny::observeEvent(input$copyButton, {
+  data <- savedData()
+  if (!is.null(data)) {
+    session$sendCustomMessage("copyToClipboard", ape::write.tree(data$tree))
+  }
+})
 
 }
 
