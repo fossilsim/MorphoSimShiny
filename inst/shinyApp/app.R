@@ -1,6 +1,7 @@
 # source the backbone functions
 source("content.R")
 
+
 #### UI #####
 ui <- shinydashboard::dashboardPage(
  skin = "black",
@@ -196,7 +197,8 @@ ui <- shinydashboard::dashboardPage(
 
       fluidRow(
         column(1,checkboxInput("keepTreeFixed", "Fix tree", value = FALSE), style = "padding-right: 5px;"),
-        column(1, checkboxInput("fossils", "Show fossils", value = FALSE))
+        column(1, checkboxInput("fossils", "Show fossils", value = FALSE)),
+        column(1, checkboxInput("reconstructed", "Show reconstructed tree", value = FALSE))
       ),
 
 
@@ -355,11 +357,10 @@ server <- function(input, output, session) {
 
     acrv_value <- if (input$useGamma) "gamma" else NULL
 
-    f <- NULL
+    f_vale <- NULL
     if (!is.null(tree)) {
-      f <- FossilSim::sim.fossils.poisson(rate = input$psi, tree = tree, root.edge = FALSE)
+      f_vale <- FossilSim::sim.fossils.poisson(rate = input$psi, tree = tree, root.edge = FALSE)
     }
-    f_vale <- if (isTRUE(input$fossils)) f else NULL
 
     # Generate data with the tree
     data <- MorphoSim::sim.morpho(
@@ -411,8 +412,15 @@ server <- function(input, output, session) {
     data <- savedData()
 
     if (!is.null(data)) {
-      # Replot the phylogeny
-      shinyplot(data, timetree = T, trait = input$s, br.rates = input$r, cbType = input$cbType, fossil= T )
+      shinyplot(
+        data,
+        timetree = TRUE,
+        trait = input$s,
+        cbType = input$cbType,
+        fossil = if (isTRUE(input$fossils)) !is.null(data$fossil) else FALSE,
+        root.edge = FALSE,
+        reconstructed = isTRUE(input$reconstructed)
+      )
     } else if (input$b < input$d){
       plot(NA, type = "n", xlim = c(0, 5), ylim = c(0, 3), ann = FALSE, bty = "n", xaxt = "n", yaxt = "n")
       text(x = 2.5, y = 1.5, labels = "Choose a speciation rate > extinction rate", cex = 1.5, col = "#800020")
