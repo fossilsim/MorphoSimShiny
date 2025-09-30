@@ -7,13 +7,10 @@
 launchMorphoSimShiny(inbrowser = TRUE)
 }
 \arguments{
-\item{inbrowser}{Launch the app inside the system's default browser or not.}
-}
-\value{
-No return value, called for side effects.
+\item{inbrowser}{Launch the app inside the system's default browser (default TRUE) or not.}
 }
 \description{
-This the function used to launch the shiny app.
+Run the app in a web browser
 }
 \examples{
 if (interactive()) {

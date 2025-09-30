@@ -1,11 +1,6 @@
 #' Run the app in a web browser
 #' 
-#' @description 
-#' This the function used to launch the shiny app.
-#' 
-#' @param inbrowser Launch the app inside the system's default browser or not.
-#' @return No return value, called for side effects.
-#' 
+#' @param inbrowser Launch the app inside the system's default browser (default TRUE) or not. 
 #' 
 #' @import shiny
 #' @importFrom shinydashboard dashboardPage
@@ -18,7 +13,7 @@
 #' @import TreeSim
 #' @import MorphoSim
 #' @import FossilSim
-#' 
+#'  
 #' @examples 
 #' if (interactive()) {
 #'   launchMorphoSimShiny()

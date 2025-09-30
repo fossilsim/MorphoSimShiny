@@ -1,7 +1,6 @@
 # source the backbone functions
 source("content.R")
 
-
 #### UI #####
 ui <- shinydashboard::dashboardPage(
  skin = "black",

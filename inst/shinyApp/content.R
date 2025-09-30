@@ -6,16 +6,16 @@ shiny.morpho <- function(n , b , d , l , k, r) {
     k = k,
     trait.num = l,
   )
-
+  
   return(data)
 }
 
 shiny.missing <- function(data, missing){
- missing.data <- MorphoSim::sim.missing.data(data = data,
-                   method = "random",
-                   seq = "tips",
-                   probability = missing)
-
+  missing.data <- MorphoSim::sim.missing.data(data = data,
+                                              method = "random",
+                                              seq = "tips",
+                                              probability = missing)
+  
   return(missing.data)
 }
 
@@ -33,7 +33,7 @@ shinyplot <- function(data, timetree = T, trait,br.rates, cbType = "none", fossi
   } else{print("there was an error with the color scheme")}
   plot(data, timetree = T, trait = trait, col = cb, fossil = fossil, edges= edges,root.edge = F,
        label.offset = label.offset,reconstructed = reconstructed, f.cex = f.cex, e.cex = e.cex)
-
+  
 }
 
 
@@ -47,7 +47,7 @@ shiny.grid <- function(data, l, cbType = "none" ){
   } else if (cbType == "tritanopia"){
     cb = c("#f4a460", "#ffb6c1", "#faebd7", "#ffcc9a", "#f5de63", "#d8bfd8", "#ffe4b5","#deb887", "#ffdead", "#e6e6fa", "#ffc0cb", "#ffdab9") # Tritanopia
   } else{print("there was an error with the color scheme")}
-MorphoSim::plotMorphoGrid(data, num.trait = l, col = cb)
+  MorphoSim::plotMorphoGrid(data, num.trait = l, col = cb)
 }
 
 # User specific tree stuff
