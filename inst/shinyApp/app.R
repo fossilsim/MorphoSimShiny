@@ -171,22 +171,7 @@ ui <- shinydashboard::dashboardPage(
       )
     ),
 
-    # for a user specific tree this breaks currently
-    shinydashboardPlus::dropdownBlock(
-      id = "controls_newick_tree",
-      title = "Provide a Tree",
-      icon = icon("tree"),
-      badgeStatus = NULL,
-
-      shiny::textAreaInput(
-        inputId = "newickTree",
-        label = "Enter Newick String for Tree",
-        value = "",
-        rows = 3,
-        placeholder = "Enter Newick string here"
-      ),
-      helpText("If empty, a random tree will be generated.")
-    ))
+    )
   ),
 
   shinydashboard::dashboardSidebar(disable = TRUE, collapsed = T),
@@ -247,27 +232,10 @@ ui <- shinydashboard::dashboardPage(
         helpText("If you have a visual condition, selecting your condition might help with visibility")
       ),
 
-      shiny::fluidRow(
-        shinydashboardPlus::box(
-          title = "Simulation Details",
-          status = "primary",
-          solidHeader = TRUE,
-          width = 12,
-          uiOutput("simulationInfo")
-        )
-      ),
-      shiny::tags$script(HTML("
-      Shiny.addCustomMessageHandler('copyToClipboard', function(message) {
-       navigator.clipboard.writeText(message).then(function() {
-        alert('Newick string copied to clipboard!');
-       }).catch(function(err) {
-        console.error('Could not copy text: ', err);
-        });
-        });
-      "))
+    ))
     )
-  )
-)
+
+
 
 
 ##### Server ####
@@ -319,19 +287,19 @@ server <- function(input, output, session) {
     req(input$b > input$d)  # Ensure speciation rate is greater than extinction rate
 
     if (is.null(currentTree()) || !input$keepTreeFixed) {
-      tree <- parseNewickTree(input$newickTree)
-      if (is.null(tree)) {
-        tree <- TreeSim::sim.bd.taxa(
-          n = input$n,
-          numbsim = 1,
-          lambda = input$b,
-          mu = input$d,
-          frac = 1
-        )[[1]]
-      }
+      # Always simulate a new tree
+      tree <- TreeSim::sim.bd.taxa(
+        n = input$n,
+        numbsim = 1,
+        lambda = input$b,
+        mu = input$d,
+        frac = 1
+      )[[1]]
+
       currentTree(tree)  # Update reactive value
     } else {
-      tree <- currentTree()  # Use existing reactive value
+      # Reuse existing tree
+      tree <- currentTree()
     }
 
     f = FossilSim::sim.fossils.poisson(rate = input$psi,
@@ -416,7 +384,7 @@ server <- function(input, output, session) {
         timetree = TRUE,
         trait = input$s,
         cbType = input$cbType,
-        fossil = if (isTRUE(input$fossils)) !is.null(data$fossil) else FALSE,
+        show.fossil = if (isTRUE(input$fossils)) !is.null(data$fossil) else FALSE,
         root.edge = FALSE,
         reconstructed = isTRUE(input$reconstructed)
       )
@@ -444,33 +412,7 @@ server <- function(input, output, session) {
     shiny::updateNumericInput(session, "s", max = totalTraits())
   })
 
-  output$simulationInfo <- shiny::renderUI({
-    data <- savedData()
-    if (!is.null(data)) {
-      shiny::tagList(
-        shiny::h4("Simulation Tree"),
-        shiny::textOutput("simDetails"),
-        shiny::textAreaInput(
-          inputId = "resultText",
-          label = "Newick String",
-          value = paste(ape::write.tree(data$tree),
-                        sep = ""),
-          rows = 5
-        ),
-        shiny::actionButton(
-          inputId = "copyButton",
-          label = "Copy",
-          icon = icon("copy"),
-          style = "margin-left: 10px;"
-        )
-      )
-    } else {
-      shiny::tagList(
-        shiny::h4("No Simulation Run Yet"),
-        shiny::p("Run the simulation to see results.")
-      )
-    }
-  })
+
 
 
    ## code for sim.missing.data
@@ -530,12 +472,7 @@ server <- function(input, output, session) {
       )
     }
   })
- shiny::observeEvent(input$copyButton, {
-  data <- savedData()
-  if (!is.null(data)) {
-    session$sendCustomMessage("copyToClipboard", ape::write.tree(data$tree))
-  }
-})
+
 
 }
 

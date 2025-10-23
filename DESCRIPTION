@@ -1,8 +1,8 @@
 Package: MorphoSimShiny
 Title: A SHINY APP for MORPHOSIM
 Version: 0.9
-Author: Tim Brandler, Laura Mulvey, Meghan Gallaspy, Joëlle Barido-Sottani, Rachel Warnock
-Maintainer: Tim Brandler <tim.brandler@fau.de>
+Author: Laura Mulvey, Tim Brandler, Alessio Capobianco, Joëlle Barido-Sottani, Rachel Warnock
+Maintainer: Laura Mulvey <lauramulvey479@gmail.com>
 Description: A visualization tool for morphological evolution based on the MorphoSim package. Used for simulating phylogenetic tree and morphologocial characters under mechanistic models of diversification and trait evolution.
 Imports: MorphoSim, FossilSim, ape, TreeSim, shiny, shinydashboard, shinydashboardPlus 
 License: GPL-3
