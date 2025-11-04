@@ -1,33 +1,79 @@
-## MorphoSimShiny
-Shiny app using the morphosim package
+# MorphSim Shiny Tutorial
 
-To use the app open R (or Rstudio) (>= v.4.4.2) and run
+## Introduction
 
-### Quick Start
+**MorphSim Shiny** provides an interactive and simplified interface for simulating morphological character evolution along phylogenetic trees based on the **MorphSim** package. Users can adjust parameters controlling tree building, fossil and extant sampling, clock rates, and substitution model settings. A visualization pane allows tracking of character state changes throughout evolutionary history.
+
+This tutorial explains how to install the app and set parameters. No prior experience with phylogenetic simulation is required.
+
+---
+
+## I. Installing and Launching the App
+
+To install the app, you will need the **devtools** package:
+
+```r
+install.packages("devtools")
+devtools::install_github("fossilsim/MorphSimShiny")  # dependencies install automatically
+MorphSimShiny::launchMorphSimShiny()
 ```
-devtools::install_github("https://github.com/fossilsim/morphosim")
-devtools::install_github("https://github.com/fossilsim/MorphoSimShiny")
-MorphoSimShiny::launchMorphoSimShiny()
-```
-Make sure you have `devtools` and `Rtools` packages installed. 
 
-### User's Guide
+## II. Model Parameters
+### i. Tree Model
 
-#### Step 1
-Familiarize yourself with all the different control panels.
-Would you like to (A) generate a new tree or (B) do you have a tree (a newick string with branch lengths in units of time) along which you'd like to simulate morphological traits?
+The Tree and Sampling menus control how the phylogenetic tree is generated and how it is observed.
+| Tree parameter              | Description                                                                                                                |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| **Number of species (N)**   | The birth–death simulation runs until N simultaneously extant lineages are present.                                        |
+| **Speciation rate (λ)**     | Rate at which lineages split. Higher values produce younger, more highly branched trees.                                   |
+| **Extinction rate (μ)**     | Rate at which lineages go extinct. While μ > λ is mathematically possible, this option is disabled here due to known bugs. |
 
-#### Step 2
-- (A) Select the number of extant taxa you want in you tree and choose the rates for speciation and extinction ("TREE MODEL")
-- (B) Paste your newick string into "PROVIDE A TREE"
 
-#### Step 3
-Select the rate of morphological change ("CLOCK MODEL"), how many different possible states and traits should be simulated, and under which morphological model the data should be simualted. If no box under "MORPOLOGICAL MODEL" is ticked, the standard MK model will be used. If everything is set up, hit the "START SIMULATION" button.
+| Sampling parameter             | Description                                                                                                                                                |
+| ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Fossil sampling rate**       | A Poisson process describing fossil recovery. Higher values produce more sampled fossils. Enabling **Show fossils** displays them as diamonds on branches. |
+| **Extant sampling proportion** | Proportion of present-day taxa that are observed.                                                                                                          |
 
-#### Step 4
-Use the "PLOTTING" panel to visualize different traits along the tree. You can use "fix tree" to keep the current tree topology and just re-simulate the character evolution. If a newick string is provided, this is not neccesary. The "Simulation details" print the newick string of the tree simulated last.
 
-#### Step 5
-Once you have simulated morphological data you can remove some of the information to better match what is commonly available from fossil data.
-Data is removed from the matrix according to a given probability. 
+### ii. Clock Model
 
+The current app supports a strict molecular clock, meaning all branches evolve at the same rate. Higher values lead to more character state changes across the tree.
+Although the underlying MorphSim package supports relaxed clocks, the Shiny app restricts users to a strict clock for simplicity.
+
+### iii. Substitution Model
+
+These settings determine how morphological characters evolve along the tree:
+
+| Setting                            | Description                                                                                             |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| **Number of partitions**           | Number of independent subsets of characters.                                                            |
+| **Number of traits per partition** | How many characters are simulated within each partition.                                                |
+| **Number of states**               | Number of discrete states for traits in each partition e.g., 2 (binary), 3, 4....                       |
+| **Morphological model**            | The substitution model used for character change. The standard **mk** model is extendable by simulating only varying traits (+V) and introducing site dependent rate heterogeneity (+G, fixed to 4 rates in the app). |
+
+## III. Visualization and Output
+### i. Plotting
+
+The app visualizes morphological evolution directly on the tree:
+- The starting state is shown at the root.
+- Every character state change is annotated on the branch where it occurs.
+
+Showing all traits at once would overcrowd the plot, so the Plotting menu allows selecting one character at a time.
+In the character matrix beside the tree, the selected character is highlighted in black, while all others appear in gray.
+
+Above the plot there are additional boxes which can be ticked:
+|Box                         | Description                                                                                                                         |
+|--------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+|**Fix tree**                | Keeps the current tree topology for the next simulation (in case you wish to just change **clock** or **substitution** parameters). |
+|**Show fossils**            | Prints the sampled fossils as diamonds on the branches.                                                                             |
+|**Show reconstructed tree** | Highlights the reconstructable topology given the incompleteness of sampling.                                                       |
+
+### ii. Colorblindness Support
+
+Character states are displayed using color.
+If the default palette is not accessible, the Colorblindness menu offers alternatives designed for:
+- Protanopia (Red-blind)
+- Deuteranopia (Green-blind)
+- Tritanopia (Blue-blind)
+
+If another palette would be helpful —or if one of these is insufficient— please contact the development team.
