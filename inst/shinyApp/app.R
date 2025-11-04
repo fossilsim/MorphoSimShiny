@@ -1,5 +1,5 @@
 # source the backbone functions
-source("content.R")
+source("inst/shinyApp/content.R")
 
 #### UI #####
 ui <- shinydashboard::dashboardPage(
@@ -174,7 +174,7 @@ ui <- shinydashboard::dashboardPage(
     )
   ),
 
-  shinydashboard::dashboardSidebar(disable = TRUE, collapsed = T),
+  shinydashboard::dashboardSidebar(disable = T, collapsed = T),
     # for the main plots tree first matrix second
   shinydashboard::dashboardBody(
     shiny::fluidRow(
@@ -184,6 +184,16 @@ ui <- shinydashboard::dashboardPage(
         column(1, checkboxInput("fossils", "Show fossils", value = FALSE)),
         column(1, checkboxInput("reconstructed", "Show reconstructed tree", value = FALSE))
       ),
+      
+      # Add the CSS to hide the spinner
+      tags$head(
+        tags$style(HTML("
+      .spinner, .fa-spinner, .fa-cogs, .loading-icon {
+        display: none !important;
+      }
+    "))
+      ),
+        
 
 
       shiny::uiOutput("paramWarning"),
