@@ -5,7 +5,7 @@ source("content.R")
 ui <- shinydashboard::dashboardPage(
  skin = "black",
   header = shinydashboardPlus::dashboardHeader(
-    title = "MorphoSim Shiny",
+    title = "MorphSim Shiny",
     # this is for the Ui display
     leftUi = shiny::tagList(
       # Controls for # of species
@@ -330,7 +330,7 @@ server <- function(input, output, session) {
     }
 
     # Generate data with the tree
-    data <- MorphoSim::sim.morpho(
+    data <- MorphSim::sim.morpho(
       time.tree = tree,
       br.rates = input$r,
       k = num_states_vector,

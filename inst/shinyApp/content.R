@@ -1,6 +1,6 @@
 shiny.morpho <- function(n , b , d , l , k, r) {
   tree <-TreeSim::sim.bd.taxa(n, numbsim = 1, lambda = b, mu = d, frac = 1)[[1]]
-  data <- MorphoSim::sim.morpho(
+  data <- MorphSim::sim.morpho(
     time.tree = tree,
     br.rates = r,
     k = k,
@@ -11,7 +11,7 @@ shiny.morpho <- function(n , b , d , l , k, r) {
 }
 
 shiny.missing <- function(data, missing){
-  missing.data <- MorphoSim::sim.missing.data(data = data,
+  missing.data <- MorphSim::sim.missing.data(data = data,
                                               method = "random",
                                               seq = "tips",
                                               probability = missing)
@@ -47,7 +47,7 @@ shiny.grid <- function(data, l, cbType = "none" ){
   } else if (cbType == "tritanopia"){
     cb = c("#f4a460", "#ffb6c1", "#faebd7", "#ffcc9a", "#f5de63", "#d8bfd8", "#ffe4b5","#deb887", "#ffdead", "#e6e6fa", "#ffc0cb", "#ffdab9") # Tritanopia
   } else{print("there was an error with the color scheme")}
-  MorphoSim::plotMorphoGrid(data, num.trait = l, col = cb)
+  MorphSim::plotMorphoGrid(data, num.trait = l, col = cb)
 }
 
 
