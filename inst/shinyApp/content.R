@@ -50,4 +50,7 @@ shiny.grid <- function(data, l, cbType = "none" ){
   MorphSim::plotMorphoGrid(data, num.trait = l, col = cb)
 }
 
+shiny.reconstructed.tree <- function (data, file){
+  MorphSim::write.recon.tree(data, file)
+}
 
