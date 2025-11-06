@@ -54,3 +54,13 @@ shiny.reconstructed.tree <- function (data, file){
   MorphSim::write.recon.tree(data, file)
 }
 
+shiny.ages <- function (data, file){
+  MorphSim::write.tsv(data, file)
+}
+
+shiny.matrix <- function(data, file, keep_matrix = F){
+  MorphSim::write.recon.matrix(data, file, keep_matrix = F)
+}
+
+
+

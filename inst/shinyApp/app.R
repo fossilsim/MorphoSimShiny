@@ -151,9 +151,9 @@ ui <- shinydashboard::dashboardPage(
           style = "display: flex; gap: 8px; flex-wrap: wrap;",  # adjust spacing here
           downloadButton("downloadTree", "Tree (.nwk)", class = "btn-sm btn-primary"),
           downloadButton("downloadReconstructedTree", "Reconstructed Tree (.nwk)", class = "btn-sm btn-primary"),
-          downloadButton("downloadFossils", "Fossil Ages (.csv)", class = "btn-sm btn-primary"),
-          downloadButton("downloadMatrix", "Trait Matrix (.csv)", class = "btn-sm btn-primary"),
-          downloadButton("downloadReconstructedMatrix", "Reconstructed Matrix (.csv)", class = "btn-sm btn-primary")
+          downloadButton("downloadFossils", "Fossil Ages (.tsv)", class = "btn-sm btn-primary"),
+          downloadButton("downloadMatrix", "Trait Matrix (.nex)", class = "btn-sm btn-primary"),
+          downloadButton("downloadReconstructedMatrix", "Reconstructed Matrix (.nex)", class = "btn-sm btn-primary")
         )
       )
     ),
@@ -351,8 +351,43 @@ server <- function(input, output, session) {
       paste0("recon_tree_", Sys.Date(), ".nwk")
     },
     content = function(file) {
-      req(currentTree())
-      shiny.reconstructed.tree(savedData(), file)
+      data <- savedData()
+      req(data)
+      shiny.reconstructed.tree(data, file)
+    }
+  )
+
+  output$downloadFossils <- downloadHandler(
+    filename = function() {
+      paste0("ages_", Sys.Date(), ".tsv")
+    },
+    content = function(file) {
+      data <- savedData()
+      req(data)
+      shiny.ages(data, file)
+    }
+  )
+
+  output$downloadMatrix <- downloadHandler(
+    filename = function() {
+      paste0("matrix", Sys.Date(), ".nex")
+    },
+    content = function(file) {
+      data <- missingData() %||% savedData()
+      req(data)
+      ape::write.nexus.data(data$sequences$tips, file, format = "standard")
+    }
+  )
+
+
+  output$downloadReconstructedMatrix <- downloadHandler(
+    filename = function() {
+      paste0("recon_matrix_", Sys.Date(), ".nex")
+    },
+    content = function(file) {
+      data <- missingData() %||% savedData()
+      req(data)
+      shiny.matrix(data, file)
     }
   )
 }
