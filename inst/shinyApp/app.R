@@ -1,5 +1,5 @@
 # source the backbone functions
-source("inst/shinyApp/content.R")
+source("content.R")
 
 #### UI ####
 ui <- shinydashboard::dashboardPage(
