@@ -31,7 +31,7 @@ The Tree and Sampling menus control how the phylogenetic tree is generated and h
 
 | Sampling parameter             | Description                                                                                                                                                |
 | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Fossil sampling rate**       | A Poisson process describing fossil recovery. Higher values produce more sampled fossils. Enabling **Show fossils** displays them as diamonds on branches. |
+| **Fossil sampling rate**       | A Poisson process describing fossil recovery. Higher values produce more sampled fossils. Enabling **Show Samples** displays fossil samples as diamonds on branches and extant samples are green circles on the tips of tree. |
 | **Extant sampling proportion** | Proportion of present-day taxa that are observed.                                                                                                          |
 
 
