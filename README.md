@@ -25,19 +25,19 @@ The Tree and Sampling menus control how the phylogenetic tree is generated and h
 | Tree parameter              | Description                                                                                                                |
 | --------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
 | **Number of species (N)**   | The birth–death simulation runs until N simultaneously extant lineages are present.                                        |
-| **Speciation rate (λ)**     | Rate at which lineages split. Higher values produce younger, more highly branched trees.                                   |
-| **Extinction rate (μ)**     | Rate at which lineages go extinct. While μ > λ is mathematically possible, this option is disabled here due to known bugs. |
+| **Speciation rate (λ)**     | Rate at which lineages split.                                   |
+| **Extinction rate (μ)**     | Rate at which lineages go extinct. |
 
 
 | Sampling parameter             | Description                                                                                                                                                |
 | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Fossil sampling rate**       | A Poisson process describing fossil recovery. Higher values produce more sampled fossils. Enabling **Show Samples** displays fossil samples as diamonds on branches and extant samples are green circles on the tips of tree. |
-| **Extant sampling proportion** | Proportion of present-day taxa that are observed.                                                                                                          |
+| **Extant sampling proportion** | Proportion of living taxa that are sampled.                                                                                                          |
 
 
 ### ii. Clock Model
 
-The current app supports a strict molecular clock, meaning all branches evolve at the same rate. Higher values lead to more character state changes across the tree.
+The current app supports a strict clock, meaning all branches evolve at the same rate. Higher values lead to more character state changes across the tree.
 Although the underlying MorphSim package supports relaxed clocks, the Shiny app restricts users to a strict clock for simplicity.
 
 ### iii. Substitution Model
@@ -47,7 +47,7 @@ These settings determine how morphological characters evolve along the tree:
 | Setting                            | Description                                                                                             |
 | ---------------------------------- | ------------------------------------------------------------------------------------------------------- |
 | **Number of partitions**           | Number of independent subsets of characters.                                                            |
-| **Number of traits per partition** | How many characters are simulated within each partition.                                                |
+| **Number of traits per partition** | Number of characters are simulated within each partition.                                                |
 | **Number of states**               | Number of discrete states for traits in each partition e.g., 2 (binary), 3, 4....                       |
 | **Morphological model**            | The substitution model used for character change. The standard **mk** model is extendable by simulating only varying traits (+V) and introducing site dependent rate heterogeneity (+G, fixed to 4 rates in the app). |
 
@@ -65,7 +65,7 @@ Above the plot there are additional boxes which can be ticked:
 |Box                         | Description                                                                                                                         |
 |--------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
 |**Fix tree**                | Keeps the current tree topology for the next simulation (in case you wish to just change **clock** or **substitution** parameters). |
-|**Show fossils**            | Prints the sampled fossils as diamonds on the branches.                                                                             |
+|**Show samples**            | Displays the sampled fossils as diamonds on the branches and the sampled extant taxa as circles at the tips.                                                                             |
 |**Show reconstructed tree** | Highlights the reconstructable topology given the incompleteness of sampling.                                                       |
 
 ### ii. Colorblindness Support
