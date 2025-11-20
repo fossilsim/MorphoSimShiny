@@ -1,3 +1,43 @@
+simulateMorphData <- function(n, b, d, l, r, psi, rho,
+                              variableCoding = FALSE, useGamma = FALSE,
+                              fixedTree = NULL,
+                              input = NULL) {   # <- pass input explicitly
+  # 1. Choose or reuse tree
+  tree <- if (is.null(fixedTree)) {
+    TreeSim::sim.bd.taxa(n = n, numbsim = 1, lambda = b, mu = d, frac = 1)[[1]]
+  } else fixedTree
+
+  # 2. Fossils
+  f <- FossilSim::sim.fossils.poisson(rate = psi, tree = tree, root.edge = FALSE)
+  fossils <- FossilSim::sim.extant.samples(fossils = f, tree = tree, rho = rho)
+
+  # 3. Partition info from Shiny input
+  num_traits_vector <- sapply(1:l, function(i) {
+    val <- input[[paste0("group_", i)]]
+    if (is.null(val)) 2 else as.numeric(val)
+  })
+
+  num_states_vector <- sapply(1:l, function(i) {
+    val <- input[[paste0("state_", i)]]
+    if (is.null(val)) 2 else as.numeric(val)
+  })
+
+  # 4. Simulate trait data
+  data <- MorphSim::sim.morpho(
+    time.tree = tree,
+    br.rates = r,
+    k = num_states_vector,
+    trait.num = sum(num_traits_vector),
+    partition = num_traits_vector,
+    variable = variableCoding,
+    ACRV = if (useGamma) "gamma" else NULL,
+    fossil = fossils
+  )
+
+  list(data = data, tree = tree)
+}
+
+
 shiny.morpho <- function(n , b , d , l , k, r) {
   tree <-TreeSim::sim.bd.taxa(n, numbsim = 1, lambda = b, mu = d, frac = 1)[[1]]
   data <- MorphSim::sim.morpho(

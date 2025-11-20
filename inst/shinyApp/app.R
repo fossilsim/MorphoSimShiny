@@ -1,5 +1,5 @@
 # source the backbone functions
-source("content.R")
+#source("content.R")
 
 #### UI ####
 ui <- shinydashboard::dashboardPage(
@@ -219,44 +219,26 @@ server <- function(input, output, session) {
   observeEvent(input$goButton, {
     req(input$b > input$d)
 
-    # Choose or reuse tree
-    tree <- if (is.null(currentTree()) || !input$keepTreeFixed) {
-      TreeSim::sim.bd.taxa(
-        n = input$n, numbsim = 1, lambda = input$b, mu = input$d, frac = 1
-      )[[1]]
-    } else currentTree()
-    currentTree(tree)
-
-    # Fossils
-    f <- FossilSim::sim.fossils.poisson(rate = input$psi, tree = tree, root.edge = FALSE)
-
-    # Extant
-    fossils <- FossilSim::sim.extant.samples(fossils = f, tree = tree, rho = input$rho)
-
-    # Partition info
-    num_traits_vector <- as.numeric(sapply(1:input$l, function(i)
-      input[[paste0("group_", i)]] %||% 2))
-    num_states_vector <- as.numeric(sapply(1:input$l, function(i)
-      input[[paste0("state_", i)]] %||% 2))
-
-    totalTraits(sum(num_traits_vector))
-
-    # Model options
-    variable_coding <- input$variableCoding
-    acrv_value <- if (input$useGamma) "gamma" else NULL
-
-    # Simulate data
-    data <- MorphSim::sim.morpho(
-      time.tree = tree,
-      br.rates = input$r,
-      k = num_states_vector,
-      trait.num = sum(num_traits_vector),
-      partition = num_traits_vector,
-      variable = variable_coding,
-      ACRV = acrv_value,
-      fossil = fossils
+    result <- simulateMorphData(
+      n = input$n,
+      b = input$b,
+      d = input$d,
+      l = input$l,
+      r = input$r,
+      psi = input$psi,
+      rho = input$rho,
+      variableCoding = input$variableCoding,
+      useGamma = input$useGamma,
+      fixedTree = if(input$keepTreeFixed) currentTree() else NULL,
+      input = input
     )
-    savedData(data)
+    savedData(result$data)
+
+    # Update currentTree only if we created a new one
+    if (!input$keepTreeFixed || is.null(currentTree())) {
+      currentTree(result$tree)
+    }
+
     missingData(NULL)
 
     # Add missing-data UI
@@ -292,18 +274,65 @@ server <- function(input, output, session) {
   output$plot1 <- renderPlot({
     data <- savedData()
     par(mar = c(6, 4, 2.5, 2))
-    if (is.null(data) && input$b < input$d) return(emptyPlot("Speciation rate must exceed extinction rate"))
+
     if (is.null(data)) return(emptyPlot("Run the simulation"))
-    shinyplot(
-      data,
-      timetree = TRUE,
-      trait = input$s,
-      cbType = input$cbType,
-      show.fossil = isTRUE(input$fossils) && !is.null(data$fossil),
-      root.edge = FALSE,
-      reconstructed = isTRUE(input$reconstructed)
-    )
+
+    safePlot <- function(data) {
+      tryCatch({
+        shinyplot(
+          data,
+          timetree = TRUE,
+          trait = input$s,
+          cbType = input$cbType,
+          show.fossil = isTRUE(input$fossils),
+          root.edge = FALSE,
+          reconstructed = isTRUE(input$reconstructed)
+        )
+        TRUE
+      }, error = function(e) FALSE)
+    }
+
+    # Retry up to 3 times
+    success <- safePlot(data)
+    tries <- 1
+    while (!success && tries < 3) {
+
+      # Only create a new tree if the user hasn't fixed it
+      tree_to_use <- if(input$keepTreeFixed && !is.null(currentTree())) {
+        currentTree()
+      } else {
+        # Generate a new tree
+        TreeSim::sim.bd.taxa(n = input$n, numbsim = 1, lambda = input$b, mu = input$d, frac = 1)[[1]]
+      }
+
+      result <- simulateMorphData(
+        n = input$n,
+        b = input$b,
+        d = input$d,
+        l = input$l,
+        r = input$r,
+        psi = input$psi,
+        rho = input$rho,
+        variableCoding = input$variableCoding,
+        useGamma = input$useGamma,
+        fixedTree = tree_to_use,
+        input = input
+      )
+
+      # Only update currentTree if we generated a new one
+      if(!input$keepTreeFixed || is.null(currentTree())) currentTree(result$tree)
+
+      savedData(result$data)
+      data <- result$data  # update data for safePlot
+
+      success <- safePlot(data)
+      tries <- tries + 1
+    }
+
+    if(!success) emptyPlot("Plotting failed after multiple attempts. Try adjusting parameters.")
   })
+
+
 
   ##### Character Matrix Plot ####
   output$plot2 <- renderPlot({
@@ -319,18 +348,22 @@ server <- function(input, output, session) {
 
   ## Parameter change warning
   observe({
-    # Track relevant inputs
-    list(input$n, input$b, input$d, input$l, input$r)
+    # Track basic inputs
+    basic_inputs <- list(input$n, input$b, input$d, input$l, input$r, input$psi, input$rho,
+                         input$variableCoding, input$useGamma)
+
+    group_inputs <- lapply(1:input$l, function(i) input[[paste0("group_", i)]])
+    state_inputs <- lapply(1:input$l, function(i) input[[paste0("state_", i)]])
+    c(basic_inputs, group_inputs, state_inputs)
     paramsChanged(TRUE)
   })
 
   output$paramWarning <- renderUI({
     if (paramsChanged()) {
       div(
-        class = "alert alert-warning",
-        role = "alert",
-        strong("Notice: "),
-        "You have changed parameters but have not run a new simulation yet."
+        "Notice: You have changed parameters but have not run a new simulation yet.",
+        style = "font-size: 12px; color: #856404; background-color: #fff3cd;
+               padding: 5px 10px; border-radius: 5px; margin-bottom: 10px;"
       )
     }
   })
