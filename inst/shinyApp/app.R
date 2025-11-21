@@ -1,5 +1,5 @@
 # source the backbone functions
-#source("content.R")
+source("content.R")
 
 #### UI ####
 ui <- shinydashboard::dashboardPage(
@@ -112,20 +112,32 @@ ui <- shinydashboard::dashboardPage(
     shiny::fluidRow(
       column(2, checkboxInput("keepTreeFixed", "Fix tree", value = FALSE), style = "padding-left: 30px;"),
       column(2, checkboxInput("fossils", "Show samples", value = FALSE)),
-      column(2, checkboxInput("reconstructed", "Show reconstructed tree", value = FALSE))
+      column(3, checkboxInput("reconstructed", "Show reconstructed tree", value = FALSE)),
+      column(3, checkboxInput("reconstructed_mat", "Show reconstructed matrix", value = FALSE))
     ),
 
     uiOutput("paramWarning"),
-
-    shiny::fluidRow(
-      shinydashboardPlus::box(
-        title = "Simulated Phylogeny", width = 7, solidHeader = TRUE,
-        plotOutput("plot1", width = "100%")
+    shinydashboardPlus::box(
+      title = "Simulated Phylogeny",
+      width = 7,
+      solidHeader = TRUE,
+      # Floating PDF button
+      div(
+        downloadButton("downloadPlotTree", "PDF", class = "btn-sm btn-primary"),
+        style = "position: absolute; top: 6px; right: 10px; z-index: 10;"
       ),
-      shinydashboardPlus::box(
-        title = "Character Matrix", width = 5, solidHeader = TRUE,
-        plotOutput("plot2", width = "100%")
-      )
+      plotOutput("plot1", width = "100%")
+    ),
+
+    shinydashboardPlus::box(
+      title = "Character Matrix",
+      width = 5,
+      solidHeader = TRUE,
+      div(
+        downloadButton("downloadPlotMatrix", "PDF", class = "btn-sm btn-primary"),
+        style = "position: absolute; top: 6px; right: 10px; z-index: 10;"
+      ),
+      plotOutput("plot2", width = "100%")
     ),
 
     shiny::fluidRow(
@@ -341,6 +353,9 @@ server <- function(input, output, session) {
     shiny.grid(data, l = input$s, cbType = input$cbType)
   })
 
+
+
+
   ##### Trait slider update ####
   observeEvent(totalTraits(), {
     updateNumericInput(session, "s", max = totalTraits())
@@ -361,7 +376,7 @@ server <- function(input, output, session) {
   output$paramWarning <- renderUI({
     if (paramsChanged()) {
       div(
-        "Notice: You have changed parameters but have not run a new simulation yet.",
+        "Notice: New parameters selected for simulation.",
         style = "font-size: 12px; color: #856404; background-color: #fff3cd;
                padding: 5px 10px; border-radius: 5px; margin-bottom: 10px;"
       )
@@ -421,6 +436,54 @@ server <- function(input, output, session) {
       data <- missingData() %||% savedData()
       req(data)
       shiny.matrix(data, file)
+    }
+  )
+
+  # download PDF of tree plot
+  output$downloadPlotTree <- downloadHandler(
+    filename = function() {
+      paste0("tree_plot_", Sys.Date(), ".pdf")
+    },
+    content = function(file) {
+      pdf(file, width = 8, height = 6)  # open PDF device
+      par(mar = c(6, 4, 2.5, 2))
+
+      # Use same plotting function as in renderPlot
+      data <- savedData()
+      if (is.null(data)) {
+        plot(NA, type = "n", xlim = c(0, 5), ylim = c(0, 3), ann = FALSE, bty = "n", xaxt = "n", yaxt = "n")
+        text(2.5, 1.5, "No data to plot", cex = 1.5, col = "#800020")
+      } else {
+        shinyplot(
+          data,
+          timetree = TRUE,
+          trait = input$s,
+          cbType = input$cbType,
+          show.fossil = isTRUE(input$fossils),
+          root.edge = FALSE,
+          reconstructed = isTRUE(input$reconstructed)
+        )
+      }
+
+      dev.off()  # close PDF device
+    }
+  )
+
+  # download PDF of character matrix plot
+  output$downloadPlotMatrix <- downloadHandler(
+    filename = function() {
+      paste0("character_matrix_", Sys.Date(), ".pdf")
+    },
+    content = function(file) {
+      pdf(file, width = 8, height = 6)
+      data <- missingData() %||% savedData()
+      if (is.null(data)) {
+        plot(NA, type = "n", xlim = c(0, 5), ylim = c(0, 3), ann = FALSE, bty = "n", xaxt = "n", yaxt = "n")
+        text(2.5, 1.5, "No data to display", cex = 1.5, col = "#800020")
+      } else {
+        shiny.grid(data, l = input$s, cbType = input$cbType)
+      }
+      dev.off()
     }
   )
 }

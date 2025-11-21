@@ -77,7 +77,7 @@ shinyplot <- function(data, timetree = T, trait,br.rates, cbType = "none", show.
 }
 
 
-shiny.grid <- function(data, l, cbType = "none" ){
+shiny.grid <- function(data, l, seq = "tips", cbType = "none" ){
   if (cbType == "none"){
     cb = c("#d3d3d3", "#add8e6", "#ffc0cb", "#ffff64", "#90ee90", "#ffa500", "#e6e6fa", "#ff7f50", "#f5de63", "#ffdeb9", "#60e0e6", "#e0ffff") # standard
   } else if (cbType == "protanopia"){
@@ -87,7 +87,7 @@ shiny.grid <- function(data, l, cbType = "none" ){
   } else if (cbType == "tritanopia"){
     cb = c("#f4a460", "#ffb6c1", "#faebd7", "#ffcc9a", "#f5de63", "#d8bfd8", "#ffe4b5","#deb887", "#ffdead", "#e6e6fa", "#ffc0cb", "#ffdab9") # Tritanopia
   } else{print("there was an error with the color scheme")}
-  MorphSim::plotMorphoGrid(data, num.trait = l, col = cb)
+  MorphSim::plotMorphoGrid(data, num.trait = l, seq = seq, col = cb)
 }
 
 shiny.reconstructed.tree <- function (data, file){
@@ -102,5 +102,8 @@ shiny.matrix <- function(data, file, keep_matrix = F){
   MorphSim::write.recon.matrix(data, file, keep_matrix = F)
 }
 
+shiny.get.reconstructed <- function(data){
+  MorphSim::get.reconstructed(data)
+}
 
 
