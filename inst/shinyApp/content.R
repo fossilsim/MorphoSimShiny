@@ -63,7 +63,7 @@ shiny.missing <- function(data, missing){
 shinyplot <- function(data, timetree = T, trait,br.rates, cbType = "none", show.fossil, root.edge, reconstructed,
                       edges = 3, label.offset = 0.05, f.cex = 2, e.cex = 1){
   if (cbType == "none"){
-    cb = c("#d3d3d3", "#add8e6", "#ffc0cb", "#ffff64", "#90ee90", "#ffa500", "#e6e6fa", "#ff7f50", "#f5de63", "#ffdeb9", "#60e0e6", "#e0ffff") # standard
+    cb = c("#fff5ee", "#add8e6", "#ffc0cb", "#ffff64", "#90ee90", "#ffa500", "#e6e6fa", "#ff7f50", "#f5de63", "#ffdeb9", "#60e0e6", "#e0ffff") # standard
   } else if (cbType == "protanopia"){
     cb = c("#e6e6fa", "#b0e0e6", "#f5deb3","#40d0d0","#fafad2", "#98fb98", "#d8bfd8", "#468264", "#87ceeb", "#ffe4b5", "#add8e6", "#ffdead") # Protanopia
   } else if (cbType == "deuteranopia"){
@@ -79,7 +79,7 @@ shinyplot <- function(data, timetree = T, trait,br.rates, cbType = "none", show.
 
 shiny.grid <- function(data, l, seq = "tips", cbType = "none" ){
   if (cbType == "none"){
-    cb = c("#d3d3d3", "#add8e6", "#ffc0cb", "#ffff64", "#90ee90", "#ffa500", "#e6e6fa", "#ff7f50", "#f5de63", "#ffdeb9", "#60e0e6", "#e0ffff") # standard
+    cb = c("#fff5ee", "#add8e6", "#ffc0cb", "#ffff64", "#90ee90", "#ffa500", "#e6e6fa", "#ff7f50", "#f5de63", "#ffdeb9", "#60e0e6", "#e0ffff") # standard
   } else if (cbType == "protanopia"){
     cb = c("#e6e6fa", "#b0e0e6", "#f5deb3","#40d0d0","#fafad2", "#98fb98", "#d8bfd8", "#468264", "#87ceeb", "#ffe4b5", "#add8e6", "#ffdead") # Protanopia
   } else if (cbType == "deuteranopia"){
