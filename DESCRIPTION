@@ -1,8 +1,11 @@
 Package: MorphSimShiny
 Title: A SHINY APP for MORPHSIM
-Version: 0.9
-Author: Laura Mulvey, Tim Brandler, Alessio Capobianco, Joëlle Barido-Sottani, Rachel Warnock
-Maintainer: Laura Mulvey <lauramulvey479@gmail.com>
+Version: 0.1.0  
+Authors@R: c(person(given = "Laura", family = "Mulvey", role = c("aut", "cre", "cph"), email = "lauramulvey479@gmail.com"),
+    person(given = "Tim", family = "Brandler",role=c("aut","cph")),
+    person(given = "Alessio", family = "Capobianco",role=c("aut","cph")),
+    person(given = "Rachel", family = "Warnock", role=c("aut","cph")),
+    person(given =  "Joelle", family = "Barido-Sottani", role=c("aut","cph")))
 Description: A visualization tool for morphological evolution based on the MorphSim package. Used for simulating phylogenetic tree and morphologocial characters under mechanistic models of diversification and trait evolution.
 Imports: MorphSim, FossilSim, ape, TreeSim, shiny, shinydashboard, shinydashboardPlus 
 License: GPL-3
