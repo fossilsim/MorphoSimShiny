@@ -350,9 +350,24 @@ server <- function(input, output, session) {
   output$plot2 <- renderPlot({
     data <- missingData() %||% savedData()
     if (is.null(data)) return(emptyPlot("No data to display"))
-    shiny.grid(data, l = input$s, cbType = input$cbType)
-  })
 
+    # If user checks "Show reconstructed matrix"
+    if (isTRUE(input$reconstructed_mat)) {
+
+      # reconstructed sequences live here
+      recon <-  shiny.get.reconstructed(data)
+
+      if (!is.null(recon$sequences$recon)) {
+        shiny.grid(recon, l = input$s, seq = "recon", cbType = input$cbType)
+      } else {
+        emptyPlot("Reconstructed matrix not available")
+      }
+
+    } else {
+      # default: simulated or missing-data matrix
+      shiny.grid(data, l = input$s, seq = "tips", cbType = input$cbType)
+    }
+  })
 
 
 

@@ -87,7 +87,7 @@ shiny.grid <- function(data, l, seq = "tips", cbType = "none" ){
   } else if (cbType == "tritanopia"){
     cb = c("#f4a460", "#ffb6c1", "#faebd7", "#ffcc9a", "#f5de63", "#d8bfd8", "#ffe4b5","#deb887", "#ffdead", "#e6e6fa", "#ffc0cb", "#ffdab9") # Tritanopia
   } else{print("there was an error with the color scheme")}
-  MorphSim::plotMorphoGrid(data, num.trait = l, seq = seq, col = cb)
+  MorphSim::plotMorphoGrid(data, timetree = TRUE, num.trait = l, seq = seq, col = cb)
 }
 
 shiny.reconstructed.tree <- function (data, file){
